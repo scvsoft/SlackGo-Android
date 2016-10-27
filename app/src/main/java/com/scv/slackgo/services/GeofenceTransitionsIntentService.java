@@ -38,7 +38,6 @@ import java.util.List;
 import java.util.Observable;
 import java.util.Observer;
 
-
 /**
  * Listens for geofence transition changes.
  */
@@ -50,6 +49,7 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
     public GeofenceTransitionsIntentService() {
         super(TAG);
     }
+
 
     //TODO get channel where to join or leave.
     @Override
@@ -67,8 +67,7 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
             msg = getString(R.string.entering_geofence);
             slackApiService.joinChannel("oficina");
-        }
-        if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
+        } else if(transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
             msg = getString(R.string.going_out_geofence);
             slackApiService.leaveChannel("C04C5T185");
         }
