@@ -93,7 +93,7 @@
                         android:id="@+id/selected_channels"
                         android:layout_width="wrap_content"
                         android:layout_height="43dp"
-                        android:text="@string/channels_to_join"
+                        android:hint="@string/channels_to_join"
                         android:textStyle=""
                         style="?android:attr/editTextStyle" />
 

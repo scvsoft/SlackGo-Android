@@ -19,7 +19,7 @@ import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.scv.slackgo.helpers.GeofenceErrorMessages;
 
-import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by kado on 10/24/16.
@@ -29,11 +29,11 @@ public class GeofenceService implements GoogleApiClient.ConnectionCallbacks, Goo
 
     protected static final String TAG = "GeofenceService";
     private Context context;
-    protected ArrayList<Geofence> mGeofenceList;
+    protected List<Geofence> mGeofenceList;
     protected GoogleApiClient mGoogleApiClient;
 
 
-    public GeofenceService(Context context, ArrayList<Geofence> mGeofenceList) {
+    public GeofenceService(Context context, List<Geofence> mGeofenceList) {
         Log.v(TAG, "GeofenceService");
 
         this.context = context;

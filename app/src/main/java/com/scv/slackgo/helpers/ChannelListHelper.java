@@ -3,20 +3,17 @@ package com.scv.slackgo.helpers;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
-import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
 import com.scv.slackgo.R;
 
 import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -85,5 +82,14 @@ public class ChannelListHelper {
             }
         });
         return value != null;
+    }
+
+    public static List<String> channelsFromTextViewString(String textViewString) {
+        if (!textViewString.equals("")) {
+            String channels = textViewString.split(":")[1].trim();
+            return Arrays.asList(channels.split(","));
+        } else {
+            return new ArrayList<String>();
+        }
     }
 }
