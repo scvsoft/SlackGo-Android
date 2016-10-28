@@ -16,6 +16,7 @@
     <string name="error_msg">An error occurred. Please try again later</string>
     <string name="invalid_location_name">This Location name is already in use.</string>
     <string name="empty_location_name">The Location name can\'t be empty.</string>
+    <string name="no_channels_added">You need to add channels to this location.</string>
 
     <!-- activity_layouts text -->
     <string name="sign_out">Sign Out</string>

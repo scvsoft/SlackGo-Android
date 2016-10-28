@@ -52,6 +52,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private SeekBar locationSeekBar;
     private TextView locationRadiusValue;
+    private TextView channelsTextView;
     private EditText locationName;
     private Button saveLocationButton;
     private Button delLocationButton;
@@ -66,9 +67,9 @@ public class LocationActivity extends MapActivity implements Observer {
     GeofenceService geofenceService;
     PlaceAutocompleteFragment autocompleteFragment;
     ListView channelsListView;
-    ArrayList<String> channels;
+    List<String> channels;
 
-    protected ArrayList<Geofence> mGeofenceList;
+    protected List<Geofence> mGeofenceList;
 
 
     @Override
@@ -179,6 +180,7 @@ public class LocationActivity extends MapActivity implements Observer {
         locationSeekBar = (SeekBar) findViewById(R.id.location_radius_seek_bar);
         locationRadiusValue = (TextView) findViewById(R.id.location_radius_value);
         locationName = (EditText) findViewById(R.id.location_name);
+        channelsTextView = (TextView) findViewById(R.id.selected_channels);
         saveLocationButton = (Button) findViewById(R.id.save_location_button);
         delLocationButton = (Button) findViewById(R.id.del_location_button);
         addChannelsButton = (Button) findViewById(R.id.add_channels);
@@ -218,8 +220,7 @@ public class LocationActivity extends MapActivity implements Observer {
         saveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                channels = new ArrayList<String>();
-                channels.add(getString(R.string.channel_office));
+                channels = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
                 if (locationClicked != null) {
                     editLocation();
                 } else {
@@ -287,6 +288,7 @@ public class LocationActivity extends MapActivity implements Observer {
             locationName.setText(locationClicked.getName());
             locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
+            channelsTextView.setText(android.text.TextUtils.join(",",locationClicked.getChannels()));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {
             float defaultProgress = Constants.DEFAULT_RADIUS_METERS / 10;
@@ -345,13 +347,13 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private boolean isValidLocation(Location location) {
         boolean isValid = true;
-        if (location.getName().isEmpty()) {
+        if (location.getName().isEmpty() || (location.getChannels().size() == 0) || (location.getChannels() == null)){
             isValid = false;
-            toastMsg = getString(R.string.empty_location_name);
+            toastMsg = location.getName().isEmpty() ? getString(R.string.empty_location_name) : getString(R.string.no_channels_added);
         } else {
             if (locationsList != null) {
                 for (Location locationInList : locationsList) {
-                    if (location.getName().equals(locationInList.getName())) {
+                    if (location.getName().equals(locationInList.getName()) && !location.getName().equals(locationClicked.getName())) {
                         isValid = false;
                         toastMsg = getString(R.string.invalid_location_name);
                     }
