@@ -34,6 +34,10 @@ import com.scv.slackgo.models.Location;
 import com.scv.slackgo.services.GeofenceService;
 import com.scv.slackgo.services.SlackApiService;
 
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
+
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
@@ -134,33 +138,78 @@ public class LocationActivity extends MapActivity implements Observer {
         });
     }
 
+    @Override
+    public void update(Observable observable, Object data) {
+        if (data != null) {
+
+            ArrayList<String> dataAsstrings = new ArrayList<String>(((ArrayList<Object>) data).size());
+            for (Object object : (ArrayList<Object>) data) {
+                dataAsstrings.add(Objects.toString(object, null));
+            }
+            String[] dataArr = new String[dataAsstrings.size()];
+
+            channelsList = dataAsstrings;
+            String[] values = dataAsstrings.toArray(dataArr);
+
+        } else {
+            slackService.getAvailableChannels();
+        }
+    }
+
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+
+        for (String permisson : permissions) {
+            switch (permisson) {
+                case Manifest.permission.ACCESS_FINE_LOCATION: {
+                    if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                                Constants.RC_ASK_PERMISSIONS);
+                    }
+                    break;
+                }
+                case Manifest.permission.ACCESS_COARSE_LOCATION: {
+                    if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
+                        ActivityCompat.requestPermissions(this,
+                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
+                                Constants.RC_ASK_PERMISSIONS);
+                    }
+                    break;
+                }
+
+            }
+        }
+    }
 
     private void checkUserPermissions() {
 
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                    Constants.RC_ASK_PERMISSIONS);
-        }
+        List<String> permission = new ArrayList<>();
 
+        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            permission.add(Manifest.permission.ACCESS_COARSE_LOCATION);
+        }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            permission.add(Manifest.permission.ACCESS_FINE_LOCATION);
+        }
+        if (!permission.isEmpty()) {
             ActivityCompat.requestPermissions(this,
-                    new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
+                    permission.toArray(new String[0]),
                     Constants.RC_ASK_PERMISSIONS);
         } else {
-            //TODO correct permission validation to remove this and invert order in the onCreate with initializeVariables()
             LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
             android.location.Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
             if (location == null) {
-                //TODO CONSTANTS OFFICE CHANGED TO DEFAULTS and anyplace.
-                editLocation.setLatitude(Constants.SCV_OFFICE_LAT);
-                editLocation.setLongitude(Constants.SCV_OFFICE_LONG);
+                editLocation.setLatitude(Constants.DEFAULT_LAT);
+                editLocation.setLongitude(Constants.DEFAULT_LONG);
             } else {
                 editLocation.setLongitude(location.getLongitude());
                 editLocation.setLatitude(location.getLatitude());
             }
         }
-
     }
 
     private void initializeVariables() {
@@ -172,7 +221,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
         Intent myIntent = getIntent();
         String locationJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_CLICKED);
-        String locationsListJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_LIST);// will return "FirstKeyValue"
+        String locationsListJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_LIST);
 
         locationClicked = GsonUtils.getObjectFromJson(locationJSON, Location.class);
         locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
@@ -213,7 +262,7 @@ public class LocationActivity extends MapActivity implements Observer {
             @Override
             public void onClick(View v) {
                 Preferences.deleteLocationFromList(LocationActivity.this, locationClicked, locationsList);
-                goToLocationActivity();
+                transitionToLocationActivity();
             }
         });
 
@@ -221,14 +270,15 @@ public class LocationActivity extends MapActivity implements Observer {
             @Override
             public void onClick(View v) {
                 channels = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
-                if (locationClicked != null) {
-                    editLocation();
+                editLocation.setName(locationName.getText().toString());
+                editLocation.setChannels(channels);
+                if (isValidLocation(editLocation)) {
+                    saveLocation();
                 } else {
-                    addNewLocation();
+                    ErrorUtils.toastError(LocationActivity.this, toastMsg, Toast.LENGTH_SHORT);
                 }
             }
         });
-
         addChannelsButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -288,7 +338,7 @@ public class LocationActivity extends MapActivity implements Observer {
             locationName.setText(locationClicked.getName());
             locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
-            channelsTextView.setText(android.text.TextUtils.join(",",locationClicked.getChannels()));
+            channelsTextView.setText(android.text.TextUtils.join(",", locationClicked.getChannels()));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {
             float defaultProgress = Constants.DEFAULT_RADIUS_METERS / 10;
@@ -298,56 +348,39 @@ public class LocationActivity extends MapActivity implements Observer {
         }
     }
 
-    private void goToLocationActivity() {
+    private void transitionToLocationActivity() {
         Intent locationsIntent = new Intent(LocationActivity.this, LocationsListActivity.class);
         startActivity(locationsIntent);
         finish();
     }
 
 
-    private void addNewLocation() {
-        editLocation.setName(locationName.getText().toString());
-        editLocation.setChannels(channels);
-
-        if (isValidLocation(editLocation)) {
+    private void saveLocation() {
+        if (locationClicked == null) {
             Preferences.addLocationToSharedPreferences(LocationActivity.this, editLocation);
             updateGeofencesList(editLocation.getName());
             geofenceService = new GeofenceService(LocationActivity.this, mGeofenceList);
-            goToLocationActivity();
+            transitionToLocationActivity();
         } else {
-            ErrorUtils.toastError(this, toastMsg, Toast.LENGTH_SHORT);
+            editLocation();
         }
     }
 
     private void editLocation() {
 
-        int locationPosition = 0;
-        for (Location editLocation : locationsList) {
-            if (editLocation.equals(locationClicked)) {
-                break;
-            }
-            locationPosition++;
-        }
+        locationsList.get(locationsList.indexOf(locationClicked)).setName(locationName.getText().toString());
+        Preferences.removeDataFromSharedPreferences(LocationActivity.this, Constants.INTENT_LOCATION_LIST);
+        Preferences.addLocationsListToSharedPreferences(LocationActivity.this, locationsList);
+        updateGeofencesList(locationClicked.getName());
+        geofenceService = new GeofenceService(LocationActivity.this, mGeofenceList);
+        transitionToLocationActivity();
 
-        editLocation.setName(locationName.getText().toString());
-        editLocation.setChannels(channels);
-
-        if (isValidLocation(editLocation)) {
-            locationsList.get(locationPosition).setName(locationName.getText().toString());
-            Preferences.removeDataFromSharedPreferences(this, Constants.INTENT_LOCATION_LIST);
-            Preferences.addLocationsListToSharedPreferences(this, locationsList);
-            updateGeofencesList(locationClicked.getName());
-            geofenceService = new GeofenceService(LocationActivity.this, mGeofenceList);
-            goToLocationActivity();
-        } else {
-            ErrorUtils.toastError(this, toastMsg, Toast.LENGTH_SHORT);
-        }
     }
 
 
     private boolean isValidLocation(Location location) {
         boolean isValid = true;
-        if (location.getName().isEmpty() || (location.getChannels().size() == 0) || (location.getChannels() == null)){
+        if (location.getName().isEmpty() || (location.getChannels().size() == 0) || (location.getChannels() == null)) {
             isValid = false;
             toastMsg = location.getName().isEmpty() ? getString(R.string.empty_location_name) : getString(R.string.no_channels_added);
         } else {
@@ -363,97 +396,33 @@ public class LocationActivity extends MapActivity implements Observer {
         return isValid;
     }
 
+    private void updateGeofencesList(final String geofenceId) {
+        Geofence newLocationGeofence = geofenceBuilder(editLocation);
+        CollectionUtils.filter(mGeofenceList, new Predicate<Geofence>() {
+            @Override
+            public boolean evaluate(Geofence object) {
+                return !object.getRequestId().equals(geofenceId);
+            }
+        });
+        mGeofenceList.add(newLocationGeofence);
 
-    private void updateGeofencesList(String geofenceId) {
-        Geofence newLocationGeofence = new Geofence.Builder()
-                .setRequestId(editLocation.getName())
-                .setCircularRegion(editLocation.getLatitude(), editLocation.getLongitude(), editLocation.getRadius())
+    }
+
+    private ArrayList<Geofence> getGeofencesList() {
+        return new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, Geofence>() {
+            @Override
+            public Geofence transform(Location loc) {
+                return  geofenceBuilder(loc);
+            }
+        }));
+    }
+
+    private Geofence geofenceBuilder(Location loc) {
+        return new Geofence.Builder()
+                .setRequestId(loc.getName())
+                .setCircularRegion(loc.getLatitude(), loc.getLongitude(), loc.getRadius())
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .build();
-
-
-        if (locationClicked == null) {
-            mGeofenceList.add(newLocationGeofence);
-        } else {
-            ArrayList<Geofence> newGeofenceList = new ArrayList<Geofence>();
-            int pos = 0;
-            for (Geofence geof : mGeofenceList) {
-                if (geof.getRequestId().equals(geofenceId)) {
-                    newGeofenceList.add(newLocationGeofence);
-                } else {
-                    newGeofenceList.add(mGeofenceList.get(pos));
-                }
-                pos++;
-            }
-            mGeofenceList = newGeofenceList;
-        }
     }
-
-
-    private ArrayList<Geofence> getGeofencesList() {
-        ArrayList<Geofence> geofences = new ArrayList<Geofence>();
-        if ((locationsList != null) && (locationsList.size() > 0)) {
-            for (Location loc : locationsList) {
-                Geofence locationGeofence = new Geofence.Builder()
-                        .setRequestId(loc.getName())
-                        .setCircularRegion(loc.getLatitude(), loc.getLongitude(), loc.getRadius())
-                        .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                        .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                        .build();
-                geofences.add(locationGeofence);
-            }
-        }
-        return geofences;
-    }
-
-
-    @Override
-    public void update(Observable observable, Object data) {
-        if (data != null) {
-
-            ArrayList<String> dataAsstrings = new ArrayList<String>(((ArrayList<Object>) data).size());
-            for (Object object : (ArrayList<Object>) data) {
-                dataAsstrings.add(Objects.toString(object, null));
-            }
-            String[] dataArr = new String[dataAsstrings.size()];
-
-            channelsList = dataAsstrings;
-            String[] values = dataAsstrings.toArray(dataArr);
-
-        } else {
-            slackService.getAvailableChannels();
-        }
-    }
-
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-
-        for (String permisson : permissions) {
-            switch (permisson) {
-                case Manifest.permission.ACCESS_FINE_LOCATION: {
-                    if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        //LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, getGeofencingRequest(), getGeofencePendingIntent()).setResultCallback(this);
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.ACCESS_FINE_LOCATION},
-                                Constants.RC_ASK_PERMISSIONS);
-                    }
-                    break;
-                }
-                case Manifest.permission.ACCESS_COARSE_LOCATION: {
-                    if (grantResults.length > 0 && grantResults[0] != PackageManager.PERMISSION_GRANTED) {
-                        ActivityCompat.requestPermissions(this,
-                                new String[]{Manifest.permission.ACCESS_COARSE_LOCATION},
-                                Constants.RC_ASK_PERMISSIONS);
-                    }
-                    break;
-                }
-
-            }
-        }
-
-    }
-
 }

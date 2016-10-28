@@ -17,7 +17,13 @@ import com.scv.slackgo.helpers.GsonUtils;
 import com.scv.slackgo.helpers.Preferences;
 import com.scv.slackgo.models.Location;
 
+import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.IterableUtils;
+import org.apache.commons.collections4.Transformer;
+
 import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -26,7 +32,7 @@ import java.util.ArrayList;
 public class LocationsListActivity extends MapActivity {
 
     ListView listView;
-    ArrayList<Location> locationsList = new ArrayList<Location>();
+    List<Location> locationsList = new ArrayList<Location>();
     GoogleMap map;
 
     @Override
@@ -69,20 +75,21 @@ public class LocationsListActivity extends MapActivity {
 
     private ArrayAdapter<String> getAdapter() {
         ArrayList<String> locations = setupLocations();
-        return new ArrayAdapter<String>(this,
+        return new ArrayAdapter<>(this,
                 android.R.layout.simple_list_item_1, android.R.id.text1, locations);
     }
 
     private ArrayList<String> setupLocations() {
+        ArrayList<String> locationListName = null;
         if (!Preferences.isLocationsListEmpty(this)) {
-            ArrayList<String> locationNameList = new ArrayList<String>();
-            for (Location location : locationsList) {
-                locationNameList.add(location.getName());
-            }
-            return locationNameList;
-        } else {
-            return new ArrayList<>();
+            locationListName =  new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, String>() {
+                @Override
+                public String transform(Location location) {
+                    return location.getName();
+                }
+            }));
         }
+        return locationListName;
     }
 
     public void addNewRegion(View view) {
@@ -106,16 +113,17 @@ public class LocationsListActivity extends MapActivity {
         this.googleMap.getUiSettings().setZoomControlsEnabled(true);
         this.googleMap.getUiSettings().setCompassEnabled(true);
 
-        if (locationsList != null) {
-            for (Location loc : locationsList) {
-                this.setMarker(loc);
+        IterableUtils.forEach(locationsList, new Closure<Location>() {
+            @Override
+            public void execute(Location loc) {
+                setMarker(loc);
             }
-        } else {
+        });
+
+        if (locationsList == null) {
             //TODO change SCV to Default location anywhere.
             this.setMarker(Location.getSCVLocation());
         }
-
-
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
         }
