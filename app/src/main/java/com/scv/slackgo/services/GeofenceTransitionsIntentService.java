@@ -32,9 +32,13 @@ import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.scv.slackgo.R;
 import com.scv.slackgo.activities.LocationActivity;
+import com.scv.slackgo.helpers.GeofenceUtils;
+import com.scv.slackgo.helpers.Preferences;
+import com.scv.slackgo.models.Channel;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -44,14 +48,14 @@ import java.util.Observer;
 public class GeofenceTransitionsIntentService extends IntentService implements Observer {
 
     protected static final String TAG = "GeofenceTransitionsIS";
-    private ArrayList<String> channelsList;
+    private Map<String, List<String>> channelsForLocationMap;
+    private ArrayList<Channel> channelsList;
 
     public GeofenceTransitionsIntentService() {
         super(TAG);
     }
 
 
-    //TODO get channel where to join or leave.
     @Override
     protected void onHandleIntent(Intent intent) {
         GeofencingEvent event = GeofencingEvent.fromIntent(intent);
@@ -62,18 +66,28 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
             return;
         }
         int transitionType = event.getGeofenceTransition();
+        channelsForLocationMap = GeofenceUtils.getChannelsForGeofences(getApplicationContext(), event.getTriggeringGeofences());
+        if (channelsList == null) {
+            channelsList = Preferences.getChannelsList(this);
+        }
+
         String msg = "";
         SlackApiService slackApiService = new SlackApiService(this);
         if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
             msg = getString(R.string.entering_geofence);
-            slackApiService.joinChannel("oficina");
-        } else if(transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
+            joinChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
+        } else if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
             msg = getString(R.string.going_out_geofence);
-            slackApiService.leaveChannel("C04C5T185");
+            leaveChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
         }
-
         sendNotification(msg);
+    }
 
+    @Override
+    public void update(Observable observable, Object data) {
+        if (data != null) {
+            channelsList = (ArrayList<Channel>) data;
+        }
     }
 
     private static String getGeofenceTransitionDetails(GeofencingEvent event) {
@@ -113,10 +127,31 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         notificationManager.notify(0, builder.build());
     }
 
-    @Override
-    public void update(Observable observable, Object data) {
-        if (data != null) {
-            channelsList = (ArrayList<String>) data;
+    private String getChannelIdFromName(String channelName) {
+        for (Channel channel : channelsList) {
+            if (channel.getName().equals(channelName))
+                return channel.getId();
+        }
+        return "";
+    }
+
+    //Leave channels from geofence in transition
+    private void leaveChannelsFromGeofences(List<Geofence> geofences, SlackApiService slackApiService) {
+        for (Geofence geofence : geofences) {
+            List<String> channels = channelsForLocationMap.get(geofence.getRequestId());
+            for (String channel : channels) {
+                slackApiService.leaveChannel(getChannelIdFromName(channel));
+            }
+        }
+    }
+
+    //Join channels from geofences in transition
+    private void joinChannelsFromGeofences(List<Geofence> geofences, SlackApiService slackApiService) {
+        for (Geofence geofence : geofences) {
+            List<String> channels = channelsForLocationMap.get(geofence.getRequestId());
+            for (String channel : channels) {
+                slackApiService.joinChannel(channel);
+            }
         }
     }
 }

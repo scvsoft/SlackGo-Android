@@ -1,0 +1,62 @@
+package com.scv.slackgo.helpers;
+
+import android.content.Context;
+
+import com.google.android.gms.location.Geofence;
+import com.scv.slackgo.models.Location;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.Transformer;
+import org.apache.commons.collections4.map.HashedMap;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
+
+/**
+ * Created by kado on 10/31/16.
+ */
+
+public class GeofenceUtils {
+
+    public static List<Geofence> getGeofencesListFromLocations(Context context, List<Location> locations) {
+        if ((locations == null) || (locations.size() == 0)) {
+            locations = Preferences.getLocationsList(context);
+        }
+        return getGeofencesList(locations);
+    }
+
+    public static Map<String, List<String>> getChannelsForGeofences(Context context, List<Geofence> geofences) {
+        Map<String, List<String>> channelsLocation = new HashedMap<>();
+        List<Location> locations = Preferences.getLocationsList(context);
+        Map<String, List<String>> allChannelsForLocationMap = ChannelListHelper.channelsByNameFromLocations(locations);
+
+        for (Location loc : locations) {
+            for (Geofence geofence : geofences) {
+                if (loc.getName().equals(geofence.getRequestId())) {
+                    channelsLocation.put(loc.getName(), allChannelsForLocationMap.get(loc.getName()));
+                }
+
+            }
+        }
+        return channelsLocation;
+    }
+
+    public static Geofence geofenceBuilder(Location loc) {
+        return new Geofence.Builder()
+                .setRequestId(loc.getName())
+                .setCircularRegion(loc.getLatitude(), loc.getLongitude(), loc.getRadius())
+                .setExpirationDuration(Geofence.NEVER_EXPIRE)
+                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
+                .build();
+    }
+
+    private static List<Geofence> getGeofencesList(List<Location> locations) {
+        return new ArrayList<>(CollectionUtils.collect(locations, new Transformer<Location, Geofence>() {
+            @Override
+            public Geofence transform(Location loc) {
+                return geofenceBuilder(loc);
+            }
+        }));
+    }
+}

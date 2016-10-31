@@ -18,7 +18,6 @@ import com.scv.slackgo.models.Channel;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -40,7 +39,7 @@ public class SlackApiService extends Observable implements APIInterface {
 
     private RequestQueue queue;
     private Context context;
-    private ArrayList<String> channelsName;
+    //private ArrayList<String> channelsName;
 
     public SlackApiService(Context context) {
         this.context = context;
@@ -72,13 +71,13 @@ public class SlackApiService extends Observable implements APIInterface {
                 new Response.Listener<String>() {
                     @Override
                     public void onResponse(String response) {
-                        Log.e(TAG,response);
+                        Log.e(TAG, response);
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.e(TAG,error.getMessage());
+                        Log.e(TAG, error.getMessage());
                     }
                 });
         queue.add(request);
@@ -168,12 +167,14 @@ public class SlackApiService extends Observable implements APIInterface {
             }
         });
 
+        /*
         channelsName = new ArrayList<>(CollectionUtils.collect(channels, new Transformer<Channel, String>() {
             public String transform(Channel channel) {
                 return channel.getName();
             }
         }));
+        */
         setChanged();
-        notifyObservers(channelsName);
+        notifyObservers(channels);
     }
 }

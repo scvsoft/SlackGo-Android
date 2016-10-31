@@ -21,7 +21,8 @@ public class Location {
     private double longitude;
     private float radius;
     private float cameraZoom;
-    private List<String> channels;
+    private List<String> channelsByName;
+    private List<String> channelsByID;
 
 
     public Location(Context context) {
@@ -36,27 +37,33 @@ public class Location {
         this.name = "";
         this.radius = Constants.DEFAULT_RADIUS_METERS;
         this.cameraZoom = Constants.DEFAULT_CAMERA_ZOOM;
-        this.channels = new ArrayList<String>(Arrays.asList("oficina"));
+        this.channelsByName = new ArrayList<String>(Arrays.asList("oficina"));
+        this.channelsByID = new ArrayList<String>(Arrays.asList("C04C5T185"));
     }
 
-    public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<String> channels) {
+    public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<String> channelsByName, List<String> channelsByID) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
         this.cameraZoom = cameraZoom;
-        this.channels = channels;
+        this.channelsByName = channelsByName;
+        this.channelsByID = channelsByID;
     }
 
     public static Location getSCVLocation() {
-        ArrayList<String> channels = new ArrayList<>();
-        channels.add("oficina");
-        return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT, Constants.SCV_OFFICE_LONG, 100, 15.0f, channels);
+        ArrayList<String> channelsByName = new ArrayList<>();
+        channelsByName.add("oficina");
+        ArrayList<String> channelsByID = new ArrayList<>();
+        channelsByID.add("C04C5T185");
+
+
+        return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT, Constants.SCV_OFFICE_LONG, 100, 15.0f, channelsByName,channelsByID );
     }
 
     public Location(LatLng location) {
         this("Location 1", location.latitude, location.longitude, 100, 15.0f,
-                new ArrayList<String>(Arrays.asList("oficina")));
+                new ArrayList<String>(Arrays.asList("oficina")),new ArrayList<String>(Arrays.asList("C04C5T185")));
     }
 
 
@@ -100,12 +107,20 @@ public class Location {
         this.cameraZoom = cameraZoom;
     }
 
-    public List<String> getChannels() {
-        return channels;
+    public List<String> getChannelsByName() {
+        return channelsByName;
     }
 
-    public void setChannels(List<String> channels) {
-        this.channels = channels;
+    public void setChannelsByName(List<String> channelsByName) {
+        this.channelsByName = channelsByName;
+    }
+
+    public List<String> getChannelsByID() {
+        return channelsByID;
+    }
+
+    public void setChannelsByID(List<String> channelsByID) {
+        this.channelsByID = channelsByID;
     }
 
     @Override

@@ -20,8 +20,10 @@ public final class Constants {
     public static final String SHARED_PREFERENCES_NAME = PACKAGE_NAME + ".PREFERENCES";
     public static final String SLACK_TOKEN = SHARED_PREFERENCES_NAME + ".token";
     public static final String SHARED_PREFERENCES_LOCATIONS = SHARED_PREFERENCES_NAME + ".LOCATIONS_SHARED";
-    public static final String INTENT_LOCATION_CLICKED = SHARED_PREFERENCES_NAME + ".REGION_CLICKED";
-    public static final String INTENT_LOCATION_LIST = SHARED_PREFERENCES_NAME + ".REGION_LIST";
+    public static final String SHARED_PREFERENCES_CHANNELS = SHARED_PREFERENCES_NAME + ".CHANNELS";
+
+    public static final String INTENT_LOCATION_CLICKED = PACKAGE_NAME + ".REGION_CLICKED";
+    public static final String INTENT_LOCATION_LIST = PACKAGE_NAME + ".REGION_LIST";
 
 
 }

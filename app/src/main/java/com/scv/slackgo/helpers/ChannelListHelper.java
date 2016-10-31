@@ -7,14 +7,18 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import com.scv.slackgo.R;
+import com.scv.slackgo.models.Channel;
+import com.scv.slackgo.models.Location;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.map.HashedMap;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by SCV on 10/25/16.
@@ -22,7 +26,7 @@ import java.util.List;
 
 public class ChannelListHelper {
 
-    public static void buildList(final Activity context, final List<String> values, ListView channelsListView) {
+    public static void buildList(final Activity context, final List<Channel> values, ListView channelsListView) {
 
         channelsListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         channelsListView.setItemsCanFocus(false);
@@ -36,7 +40,7 @@ public class ChannelListHelper {
         builderSingle.setAdapter(adapter, new DialogInterface.OnClickListener() {
             @Override
             public void onClick(DialogInterface dialog, int which) {
-                String strName = adapter.getItem(which);
+                String strName = adapter.getItem(which).getName();
             }
         });
 
@@ -54,12 +58,12 @@ public class ChannelListHelper {
                                 if (!concatChannels.equals("")) {
                                     concatChannels = concatChannels.concat(", ");
                                 }
-                                concatChannels = concatChannels.concat(values.get(i));
+                                concatChannels = concatChannels.concat(values.get(i).getName());
                             }
                         }
-                        IterableUtils.forEach(values, new Closure<String>() {
+                        IterableUtils.forEach(values, new Closure<Channel>() {
                             @Override
-                            public void execute(String input) {
+                            public void execute(Channel input) {
 
                             }
                         });
@@ -92,4 +96,28 @@ public class ChannelListHelper {
             return new ArrayList<String>();
         }
     }
+
+    public static List<String> channelsByIDFromTextViewString(List<String> channelsByName, List<Channel> channels) {
+        List<String> channelsById = new ArrayList<String>();
+        for (Channel channel : channels ){
+            for (String channelName : channelsByName){
+                if (channelName.equals(channel.getName())){
+                    channelsById.add(channel.getId());
+                }
+            }
+        }
+        return channelsById;
+    }
+
+
+    public static Map<String, List<String>>  channelsByNameFromLocations(List<Location> locations){
+        Map<String,List<String>> channelLocationMap = new HashedMap<>();
+
+        for (Location loc : locations) {
+            channelLocationMap.put(loc.getName(),loc.getChannelsByName());
+        }
+
+        return channelLocationMap;
+    }
+
 }

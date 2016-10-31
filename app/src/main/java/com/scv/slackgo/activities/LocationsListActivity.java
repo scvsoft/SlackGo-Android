@@ -82,7 +82,7 @@ public class LocationsListActivity extends MapActivity {
     private ArrayList<String> setupLocations() {
         ArrayList<String> locationListName = null;
         if (!Preferences.isLocationsListEmpty(this)) {
-            locationListName =  new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, String>() {
+            locationListName = new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, String>() {
                 @Override
                 public String transform(Location location) {
                     return location.getName();
@@ -129,7 +129,6 @@ public class LocationsListActivity extends MapActivity {
         }
 
     }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
