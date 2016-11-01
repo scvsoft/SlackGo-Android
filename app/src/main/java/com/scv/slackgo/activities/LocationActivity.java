@@ -61,7 +61,6 @@ public class LocationActivity extends MapActivity implements Observer {
     private Button saveLocationButton;
     private Button delLocationButton;
     private Button addChannelsButton;
-    private Location location;
     private Location locationClicked;
     private Location editLocation;
     private List<Location> locationsList;
@@ -71,8 +70,6 @@ public class LocationActivity extends MapActivity implements Observer {
     GeofenceService geofenceService;
     PlaceAutocompleteFragment autocompleteFragment;
     ListView channelsListView;
-    List<String> channelsByName;
-    List<String> channelsById;
 
     protected List<Geofence> mGeofenceList;
 
@@ -250,8 +247,6 @@ public class LocationActivity extends MapActivity implements Observer {
             @Override
             public void onPlaceSelected(Place place) {
                 editLocation = new Location(place.getLatLng());
-                editLocation.setLatitude(place.getLatLng().latitude);
-                editLocation.setLongitude(place.getLatLng().longitude);
                 setMarker(editLocation);
             }
 
@@ -275,11 +270,10 @@ public class LocationActivity extends MapActivity implements Observer {
         saveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                channelsByName = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
-                channelsById = ChannelListHelper.channelsByIDFromTextViewString(channelsByName, channelsList);
+                List<String> channelsByName = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
                 editLocation.setName(locationName.getText().toString());
                 editLocation.setChannelsByName(channelsByName);
-                editLocation.setChannelsByID(channelsById);
+                editLocation.setChannelsByID(ChannelListHelper.channelsByIDFromTextViewString(channelsByName, channelsList));
                 if (isValidLocation(editLocation)) {
                     saveLocation();
                 } else {
@@ -388,7 +382,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private boolean isValidLocation(Location location) {
         boolean isValid = true;
-        if (location.getName().isEmpty() || (location.getChannelsByName().size() == 0) || (location.getChannelsByName() == null)) {
+        if (location.getName().isEmpty() || (location.getChannelsByName().size() == 0)) {
             isValid = false;
             toastMsg = location.getName().isEmpty() ? getString(R.string.empty_location_name) : getString(R.string.no_channels_added);
         } else {

@@ -11,6 +11,7 @@ import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 
 import org.apache.commons.collections4.Closure;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.map.HashedMap;
@@ -68,7 +69,7 @@ public class ChannelListHelper {
                             }
                         });
 
-                        ((TextView) context.findViewById(R.id.selected_channels)).setText(context.getText(R.string.channels_to_join) + concatChannels);
+                        ((TextView) context.findViewById(R.id.selected_channels)).setText(concatChannels);
                     }
                 });
 
@@ -90,26 +91,36 @@ public class ChannelListHelper {
 
     public static List<String> channelsFromTextViewString(String textViewString) {
         if (!textViewString.equals("")) {
-            String channels = textViewString.split(":")[1].trim();
-            return Arrays.asList(channels.split(","));
+            return Arrays.asList(textViewString.trim().split(","));
         } else {
             return new ArrayList<String>();
         }
     }
 
-    public static List<String> channelsByIDFromTextViewString(List<String> channelsByName, List<Channel> channels) {
-        List<String> channelsById = new ArrayList<String>();
-        for (Channel channel : channels ){
-            for (String channelName : channelsByName){
-                if (channelName.equals(channel.getName())){
-                    channelsById.add(channel.getId());
-                }
+    //TODO when saving channel in Location as json, this must be removed
+    public static List<String> channelsByIDFromTextViewString(final List<String> channelsByName, List<Channel> channels) {
+        List<Channel> newChannels = channels;
+        CollectionUtils.filter(newChannels, new Predicate<Channel>() {
+            @Override
+            public boolean evaluate(final Channel chan) {
+                boolean hasChannel = IterableUtils.matchesAny(channelsByName, new Predicate<String>() {
+                    public boolean evaluate(String channelName) {
+                        return chan.getName().equals(channelName);
+                    }
+                });
+                return hasChannel;
             }
+        });
+
+        List<String> channelsById = new ArrayList<String>();
+        for (Channel channel : newChannels){
+            channelsById.add(channel.getId());
         }
         return channelsById;
+
     }
 
-
+    //TODO when saving channel in Location as json, this must be removed
     public static Map<String, List<String>>  channelsByNameFromLocations(List<Location> locations){
         Map<String,List<String>> channelLocationMap = new HashedMap<>();
 

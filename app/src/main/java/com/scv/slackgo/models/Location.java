@@ -37,8 +37,8 @@ public class Location {
         this.name = "";
         this.radius = Constants.DEFAULT_RADIUS_METERS;
         this.cameraZoom = Constants.DEFAULT_CAMERA_ZOOM;
-        this.channelsByName = new ArrayList<String>(Arrays.asList("oficina"));
-        this.channelsByID = new ArrayList<String>(Arrays.asList("C04C5T185"));
+        this.channelsByName = new ArrayList<String>(Arrays.asList(Constants.OFFICE));
+        this.channelsByID = new ArrayList<String>(Arrays.asList(Constants.OFICINA_CHANNEL_ID));
     }
 
     public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<String> channelsByName, List<String> channelsByID) {
@@ -53,9 +53,9 @@ public class Location {
 
     public static Location getSCVLocation() {
         ArrayList<String> channelsByName = new ArrayList<>();
-        channelsByName.add("oficina");
+        channelsByName.add(Constants.OFFICE);
         ArrayList<String> channelsByID = new ArrayList<>();
-        channelsByID.add("C04C5T185");
+        channelsByID.add(Constants.OFICINA_CHANNEL_ID);
 
 
         return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT, Constants.SCV_OFFICE_LONG, 100, 15.0f, channelsByName,channelsByID );
@@ -63,7 +63,7 @@ public class Location {
 
     public Location(LatLng location) {
         this("Location 1", location.latitude, location.longitude, 100, 15.0f,
-                new ArrayList<String>(Arrays.asList("oficina")),new ArrayList<String>(Arrays.asList("C04C5T185")));
+                new ArrayList<String>(Arrays.asList(Constants.OFFICE)),new ArrayList<String>(Arrays.asList(Constants.OFICINA_CHANNEL_ID)));
     }
 
 

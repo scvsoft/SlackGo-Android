@@ -13,6 +13,7 @@ public final class Constants {
     public static final float DEFAULT_LAT = -34.6037f;
     public static final float DEFAULT_LONG = -58.3819f;
     public static final String OFFICE = "Office";
+    public static final String OFICINA_CHANNEL_ID = "C04C5T185";
     public static final int RC_ASK_PERMISSIONS = 123;
     public static final float DEFAULT_RADIUS_METERS = 100.0f;
     public static final float DEFAULT_CAMERA_ZOOM = 15.0f;
