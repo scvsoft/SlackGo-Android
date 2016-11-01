@@ -28,20 +28,20 @@ import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.ChannelListHelper;
 import com.scv.slackgo.helpers.Constants;
 import com.scv.slackgo.helpers.ErrorUtils;
+import com.scv.slackgo.helpers.GeofenceUtils;
 import com.scv.slackgo.helpers.GsonUtils;
 import com.scv.slackgo.helpers.Preferences;
+import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 import com.scv.slackgo.services.GeofenceService;
 import com.scv.slackgo.services.SlackApiService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.Transformer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Objects;
 import java.util.Observable;
 import java.util.Observer;
 
@@ -61,17 +61,15 @@ public class LocationActivity extends MapActivity implements Observer {
     private Button saveLocationButton;
     private Button delLocationButton;
     private Button addChannelsButton;
-    private Location location;
     private Location locationClicked;
     private Location editLocation;
     private List<Location> locationsList;
-    private List<String> channelsList;
+    private List<Channel> channelsList;
     private String toastMsg;
     SlackApiService slackService;
     GeofenceService geofenceService;
     PlaceAutocompleteFragment autocompleteFragment;
     ListView channelsListView;
-    List<String> channels;
 
     protected List<Geofence> mGeofenceList;
 
@@ -141,15 +139,13 @@ public class LocationActivity extends MapActivity implements Observer {
     @Override
     public void update(Observable observable, Object data) {
         if (data != null) {
-
-            ArrayList<String> dataAsstrings = new ArrayList<String>(((ArrayList<Object>) data).size());
+            List<Channel> dataAsstrings = new ArrayList<Channel>(((ArrayList<Object>) data).size());
             for (Object object : (ArrayList<Object>) data) {
-                dataAsstrings.add(Objects.toString(object, null));
+                dataAsstrings.add((Channel) object);
             }
             String[] dataArr = new String[dataAsstrings.size()];
-
+            Preferences.addChannelsToSharedPreferences(LocationActivity.this, dataAsstrings);
             channelsList = dataAsstrings;
-            String[] values = dataAsstrings.toArray(dataArr);
 
         } else {
             slackService.getAvailableChannels();
@@ -225,6 +221,11 @@ public class LocationActivity extends MapActivity implements Observer {
 
         locationClicked = GsonUtils.getObjectFromJson(locationJSON, Location.class);
         locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
+
+        if (channelsList == null) {
+            channelsList = Preferences.getChannelsList(this);
+        }
+
         //Get resources
         locationSeekBar = (SeekBar) findViewById(R.id.location_radius_seek_bar);
         locationRadiusValue = (TextView) findViewById(R.id.location_radius_value);
@@ -237,7 +238,7 @@ public class LocationActivity extends MapActivity implements Observer {
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        mGeofenceList = getGeofencesList();
+        mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(this, locationsList);
     }
 
 
@@ -269,9 +270,10 @@ public class LocationActivity extends MapActivity implements Observer {
         saveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                channels = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
+                List<String> channelsByName = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
                 editLocation.setName(locationName.getText().toString());
-                editLocation.setChannels(channels);
+                editLocation.setChannelsByName(channelsByName);
+                editLocation.setChannelsByID(ChannelListHelper.channelsByIDFromTextViewString(channelsByName, channelsList));
                 if (isValidLocation(editLocation)) {
                     saveLocation();
                 } else {
@@ -338,7 +340,7 @@ public class LocationActivity extends MapActivity implements Observer {
             locationName.setText(locationClicked.getName());
             locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
-            channelsTextView.setText(android.text.TextUtils.join(",", locationClicked.getChannels()));
+            channelsTextView.setText(android.text.TextUtils.join(",", locationClicked.getChannelsByName()));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {
             float defaultProgress = Constants.DEFAULT_RADIUS_METERS / 10;
@@ -380,7 +382,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private boolean isValidLocation(Location location) {
         boolean isValid = true;
-        if (location.getName().isEmpty() || (location.getChannels().size() == 0) || (location.getChannels() == null)) {
+        if (location.getName().isEmpty() || (location.getChannelsByName().size() == 0)) {
             isValid = false;
             toastMsg = location.getName().isEmpty() ? getString(R.string.empty_location_name) : getString(R.string.no_channels_added);
         } else {
@@ -397,7 +399,7 @@ public class LocationActivity extends MapActivity implements Observer {
     }
 
     private void updateGeofencesList(final String geofenceId) {
-        Geofence newLocationGeofence = geofenceBuilder(editLocation);
+        Geofence newLocationGeofence = GeofenceUtils.geofenceBuilder(editLocation);
         CollectionUtils.filter(mGeofenceList, new Predicate<Geofence>() {
             @Override
             public boolean evaluate(Geofence object) {
@@ -408,21 +410,4 @@ public class LocationActivity extends MapActivity implements Observer {
 
     }
 
-    private ArrayList<Geofence> getGeofencesList() {
-        return new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, Geofence>() {
-            @Override
-            public Geofence transform(Location loc) {
-                return  geofenceBuilder(loc);
-            }
-        }));
-    }
-
-    private Geofence geofenceBuilder(Location loc) {
-        return new Geofence.Builder()
-                .setRequestId(loc.getName())
-                .setCircularRegion(loc.getLatitude(), loc.getLongitude(), loc.getRadius())
-                .setExpirationDuration(Geofence.NEVER_EXPIRE)
-                .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
-                .build();
-    }
 }

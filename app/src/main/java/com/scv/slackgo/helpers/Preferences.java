@@ -4,11 +4,9 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -26,15 +24,23 @@ public class Preferences {
     }
 
     public static ArrayList<Location> getLocationsList(Context context) {
-        Gson gson = new Gson();
         SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
-        String locationsJSON = sharedPreferences.getString(Constants.SHARED_PREFERENCES_LOCATIONS, "");
+        String locationsJSON = sharedPreferences.getString(Constants.SHARED_PREFERENCES_LOCATIONS, null);
+        if (locationsJSON != null) {
+            return GsonUtils.getListFromJson(locationsJSON, Location[].class);
+        }
 
-        Type listOfTestObject = new TypeToken<List<Location>>() {
-        }.getType();
-        ArrayList<Location> locations = gson.fromJson(locationsJSON, listOfTestObject);
+        return new ArrayList<Location>();
+    }
 
-        return locations;
+    public static ArrayList<Channel> getChannelsList(Context context) {
+        SharedPreferences sharedPreferences = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        String channelsJSON = sharedPreferences.getString(Constants.SHARED_PREFERENCES_CHANNELS, null);
+        if (channelsJSON != null) {
+            return GsonUtils.getListFromJson(channelsJSON, Channel[].class);
+        }
+
+        return new ArrayList<Channel>();
     }
 
     public static Boolean isLocationsListEmpty(Activity activity) {
@@ -43,12 +49,18 @@ public class Preferences {
     }
 
     public static void addLocationsListToSharedPreferences(Activity activity, List<Location> locations) {
-        Gson gson = new Gson();
-        String locationsJSON = gson.toJson(locations);
-
+        String locationsJSON = GsonUtils.getJsonFromObject(locations);
         SharedPreferences sharedPreferences = activity.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString(Constants.SHARED_PREFERENCES_LOCATIONS, locationsJSON);
+        editor.commit();
+    }
+
+    public static void addChannelsToSharedPreferences(Activity activity, List<Channel> channels) {
+        String channelsJSON = GsonUtils.getJsonFromObject(channels);
+        SharedPreferences sharedPreferecnes = activity.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, Context.MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferecnes.edit();
+        editor.putString(Constants.SHARED_PREFERENCES_CHANNELS, channelsJSON);
         editor.commit();
     }
 
@@ -71,8 +83,7 @@ public class Preferences {
             addLocationsListToSharedPreferences(activity, locationsList);
         }
     }
-
-
+    
     private static boolean locationWithNameExistsInList(ArrayList<Location> locations, String locationName) {
         for (Location location : locations) {
             if (location.getName().equals(locationName)) {
