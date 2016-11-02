@@ -14,8 +14,8 @@ import com.google.android.gms.maps.GoogleMap;
 import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.Constants;
 import com.scv.slackgo.helpers.GsonUtils;
-import com.scv.slackgo.helpers.Preferences;
 import com.scv.slackgo.models.Location;
+import com.scv.slackgo.models.LocationsStore;
 
 import org.apache.commons.collections4.Closure;
 import org.apache.commons.collections4.CollectionUtils;
@@ -32,25 +32,35 @@ import java.util.List;
 public class LocationsListActivity extends MapActivity {
 
     ListView listView;
+    LocationsStore locationsStore;
     List<Location> locationsList = new ArrayList<Location>();
     GoogleMap map;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        initializeVariables();
         getLoaderManager().destroyLoader(0);
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        locationsList = Preferences.getLocationsList(this);
+        loadLocationsList();
         setListView();
     }
 
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
+    }
+
+    public void initializeVariables() {
+        locationsStore = new LocationsStore(getApplicationContext());
+    }
+
+    public void loadLocationsList() {
+        locationsList = locationsStore.getList();
     }
 
     private void setListView() {
@@ -73,6 +83,10 @@ public class LocationsListActivity extends MapActivity {
         });
     }
 
+    @Override
+    public void onBackPressed() {
+    }
+
     private ArrayAdapter<String> getAdapter() {
         ArrayList<String> locations = setupLocations();
         return new ArrayAdapter<>(this,
@@ -81,7 +95,7 @@ public class LocationsListActivity extends MapActivity {
 
     private ArrayList<String> setupLocations() {
         ArrayList<String> locationListName = null;
-        if (!Preferences.isLocationsListEmpty(this)) {
+        if (!locationsStore.isLocationsListEmpty()) {
             locationListName = new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, String>() {
                 @Override
                 public String transform(Location location) {
@@ -112,6 +126,7 @@ public class LocationsListActivity extends MapActivity {
         super.onMapReady(googleMap);
         this.googleMap.getUiSettings().setZoomControlsEnabled(true);
         this.googleMap.getUiSettings().setCompassEnabled(true);
+        locationsList = locationsStore.getList();
 
         IterableUtils.forEach(locationsList, new Closure<Location>() {
             @Override

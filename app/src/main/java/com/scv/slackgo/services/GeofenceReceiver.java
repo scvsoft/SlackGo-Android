@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.google.android.gms.location.Geofence;
 import com.scv.slackgo.helpers.GeofenceUtils;
+import com.scv.slackgo.models.LocationsStore;
 
 import java.util.List;
 
@@ -23,7 +24,8 @@ public class GeofenceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "GeofenceReceiver");
-        List<Geofence> mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(context, null);
+        LocationsStore locationsStore = new LocationsStore(context);
+        List<Geofence> mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, null);
         geofenceService = new GeofenceService(context, mGeofenceList);
     }
 

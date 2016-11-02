@@ -16,19 +16,21 @@ import android.widget.ImageView;
 
 import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.Constants;
-import com.scv.slackgo.helpers.Preferences;
+import com.scv.slackgo.models.LocationsStore;
 
 import java.io.InputStream;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
     private ImageView slackButton;
+    private LocationsStore locationsStore;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
 
+        locationsStore = new LocationsStore(getApplicationContext());
         String slackCode = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
 
         if (slackCode == null) {
@@ -48,7 +50,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
             });
         } else {
             Intent nextIntent;
-            if (Preferences.isLocationsListEmpty(this)) {
+            if (locationsStore.isLocationsListEmpty()) {
                 nextIntent = new Intent(this, LocationActivity.class);
             } else {
                 nextIntent = new Intent(this, LocationsListActivity.class);
