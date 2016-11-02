@@ -213,7 +213,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
         editLocation = new Location(this);
         slackService = new SlackApiService(this);
-        locationsStore = new LocationsStore(this);
+        locationsStore = LocationsStore.getInstance();
 
         channelsListView = (ListView) findViewById(R.id.channel_list);
 

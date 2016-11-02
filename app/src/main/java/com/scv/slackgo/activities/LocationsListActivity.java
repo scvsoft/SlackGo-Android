@@ -56,7 +56,7 @@ public class LocationsListActivity extends MapActivity {
     }
 
     public void initializeVariables() {
-        locationsStore = new LocationsStore(getApplicationContext());
+        locationsStore = LocationsStore.getInstance();
     }
 
     public void loadLocationsList() {

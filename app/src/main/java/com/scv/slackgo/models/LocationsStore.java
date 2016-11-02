@@ -2,6 +2,7 @@ package com.scv.slackgo.models;
 
 import android.content.Context;
 
+import com.scv.slackgo.SlackGoApplication;
 import com.scv.slackgo.helpers.Constants;
 import com.scv.slackgo.helpers.Preferences;
 
@@ -15,10 +16,28 @@ public class LocationsStore {
     private Context context;
     private Preferences preferences;
 
-    public LocationsStore(Context context) {
-        this.context = context;
+    private static LocationsStore instance;
+
+    public LocationsStore() {
+        this.context = SlackGoApplication.get();
         this.preferences = new Preferences(context);
     }
+
+
+    public static LocationsStore getInstance() {
+        if (instance == null) {
+            instance = getSync();
+        }
+        return instance;
+    }
+
+    private static synchronized LocationsStore getSync() {
+        if (instance == null) {
+            instance = new LocationsStore();
+        }
+        return instance;
+    }
+
 
     // Everything related to Locations
     public List<Location> getList() {

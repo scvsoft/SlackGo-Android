@@ -60,7 +60,7 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
     @Override
     public void onCreate() {
         super.onCreate();
-        locationsStore = new LocationsStore(this);
+        locationsStore = LocationsStore.getInstance();
     }
 
     @Override

@@ -24,7 +24,7 @@ public class GeofenceReceiver extends BroadcastReceiver {
     @Override
     public void onReceive(Context context, Intent intent) {
         Log.v(TAG, "GeofenceReceiver");
-        LocationsStore locationsStore = new LocationsStore(context);
+        LocationsStore locationsStore = LocationsStore.getInstance();
         List<Geofence> mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, null);
         geofenceService = new GeofenceService(context, mGeofenceList);
     }
