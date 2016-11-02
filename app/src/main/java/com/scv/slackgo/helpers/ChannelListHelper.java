@@ -34,8 +34,7 @@ public class ChannelListHelper {
         final AlertDialog.Builder builderSingle = new AlertDialog.Builder(context);
         builderSingle.setTitle("Available Channels");
 
-        final ChannelsListAdapter adapter = new ChannelsListAdapter(context,
-                R.layout.list_layout, values);
+        final ChannelsListAdapter adapter = getChannelsAdapter(context, values);
 
         builderSingle.setAdapter(adapter, new DialogInterface.OnClickListener() {
             @Override
@@ -76,6 +75,54 @@ public class ChannelListHelper {
 
 
         channelsAlert.show();
+    }
+
+    private static ChannelsListAdapter getChannelsAdapter(Activity context, List<Channel> values) {
+
+        final List<Channel> selectedValues = getSelectedValues(context, values);
+
+        CollectionUtils.filter(values, new Predicate<Channel>() {
+            @Override
+            public boolean evaluate(Channel channel) {
+                return !isIn(selectedValues, channel.getName());
+            }
+        });
+
+        return new ChannelsListAdapter(context, R.layout.list_layout, values, selectedValues);
+    }
+
+    private static List<Channel> getSelectedValues(Activity context, List<Channel> values) {
+
+        final List<String> selectedChannels = Arrays.asList(((TextView) context.findViewById(R.id.selected_channels)).getText().toString().split(", "));
+
+        CollectionUtils.filter(values, new Predicate<Channel>() {
+            @Override
+            public boolean evaluate(Channel channel) {
+                return isIn(selectedChannels.toArray(new String[0]), channel.getName());
+            }
+        });
+
+        return values;
+    }
+
+    private static boolean isIn(List<Channel> selectedChannels, final String channelName) {
+        Channel value = IterableUtils.find(selectedChannels, new Predicate<Channel>() {
+            @Override
+            public boolean evaluate(Channel selectedName) {
+                return channelName.equals(selectedName.getName());
+            }
+        });
+        return value != null;
+    }
+
+    private static boolean isIn(String[] selectedChannels, final String channelName) {
+        String value = IterableUtils.find(Arrays.asList(selectedChannels), new Predicate<String>() {
+            @Override
+            public boolean evaluate(String selectedName) {
+                return channelName.equals(selectedName);
+            }
+        });
+        return value != null;
     }
 
     private static boolean isIn(Integer[] ids, final int id) {

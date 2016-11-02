@@ -4,11 +4,14 @@ import com.scv.slackgo.helpers.Constants;
 
 import java.io.Serializable;
 
+import java.util.Comparator;
+
 /**
  * Created by ayelen@scvsoft.com on 10/20/16.
  */
 
-public class Channel implements Serializable {
+
+public class Channel implements Comparable<Channel>, Serializable{
 
     String name;
     boolean isArchived;
@@ -44,4 +47,22 @@ public class Channel implements Serializable {
         return isArchived;
     }
 
+    public void setArchived(boolean archived) {
+        isArchived = archived;
+    }
+
+    @Override
+    public int compareTo(Channel another) {
+        return Comparators.NAME.compare(this, another);
+    }
+
+    public static class Comparators {
+
+        public static Comparator<Channel> NAME = new Comparator<Channel>() {
+            @Override
+            public int compare(Channel o1, Channel o2) {
+                return o1.name.compareTo(o2.name);
+            }
+        };
+    }
 }
