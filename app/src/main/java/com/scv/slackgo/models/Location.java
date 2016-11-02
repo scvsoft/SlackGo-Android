@@ -14,16 +14,12 @@ import java.util.List;
  */
 
 public class Location {
-
-    private Context myContext;
     private String name;
     private double latitude;
     private double longitude;
     private float radius;
     private float cameraZoom;
-    private List<String> channelsByName;
-    private List<String> channelsByID;
-
+    private List<Channel> channels;
 
     public Location(Context context) {
         /* TODO correct permissons to be able to set your location at first.
@@ -37,35 +33,27 @@ public class Location {
         this.name = "";
         this.radius = Constants.DEFAULT_RADIUS_METERS;
         this.cameraZoom = Constants.DEFAULT_CAMERA_ZOOM;
-        this.channelsByName = new ArrayList<String>(Arrays.asList(Constants.OFFICE));
-        this.channelsByID = new ArrayList<String>(Arrays.asList(Constants.OFICINA_CHANNEL_ID));
+        this.channels = new ArrayList<Channel>(Arrays.asList(new Channel(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID)));
     }
 
-    public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<String> channelsByName, List<String> channelsByID) {
+    public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<Channel> channels) {
         this.name = name;
         this.latitude = latitude;
         this.longitude = longitude;
         this.radius = radius;
         this.cameraZoom = cameraZoom;
-        this.channelsByName = channelsByName;
-        this.channelsByID = channelsByID;
+        this.channels = channels;
     }
 
     public static Location getSCVLocation() {
-        ArrayList<String> channelsByName = new ArrayList<>();
-        channelsByName.add(Constants.OFFICE);
-        ArrayList<String> channelsByID = new ArrayList<>();
-        channelsByID.add(Constants.OFICINA_CHANNEL_ID);
-
-
-        return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT, Constants.SCV_OFFICE_LONG, 100, 15.0f, channelsByName,channelsByID );
+        return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT,
+                Constants.SCV_OFFICE_LONG, 100, 15.0f,
+                new ArrayList<Channel>(Arrays.asList(new Channel(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID))));
     }
 
     public Location(LatLng location) {
-        this("Location 1", location.latitude, location.longitude, 100, 15.0f,
-                new ArrayList<String>(Arrays.asList(Constants.OFFICE)),new ArrayList<String>(Arrays.asList(Constants.OFICINA_CHANNEL_ID)));
+        this("Location 1", location.latitude, location.longitude, 100, 15.0f, new ArrayList<Channel>(Arrays.asList(new Channel())));
     }
-
 
     public String getName() {
         return name;
@@ -95,32 +83,16 @@ public class Location {
         return radius;
     }
 
-    public void setRadius(float radius) {
-        this.radius = radius;
-    }
-
     public float getCameraZoom() {
         return cameraZoom;
     }
 
-    public void setCameraZoom(float cameraZoom) {
-        this.cameraZoom = cameraZoom;
+    public List<Channel> getChannels() {
+        return channels;
     }
 
-    public List<String> getChannelsByName() {
-        return channelsByName;
-    }
-
-    public void setChannelsByName(List<String> channelsByName) {
-        this.channelsByName = channelsByName;
-    }
-
-    public List<String> getChannelsByID() {
-        return channelsByID;
-    }
-
-    public void setChannelsByID(List<String> channelsByID) {
-        this.channelsByID = channelsByID;
+    public void setChannels(List<Channel> channels) {
+        this.channels = channels;
     }
 
     @Override

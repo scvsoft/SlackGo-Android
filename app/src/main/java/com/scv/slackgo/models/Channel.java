@@ -1,13 +1,14 @@
 package com.scv.slackgo.models;
 
-import org.json.JSONException;
-import org.json.JSONObject;
+import com.scv.slackgo.helpers.Constants;
+
+import java.io.Serializable;
 
 /**
  * Created by ayelen@scvsoft.com on 10/20/16.
  */
 
-public class Channel {
+public class Channel implements Serializable {
 
     String name;
     boolean isArchived;
@@ -21,16 +22,14 @@ public class Channel {
         this.id = id;
     }
 
-    public Channel(String name, boolean isArchived, String id){
+    public Channel(String name, boolean isArchived, String id) {
         this.name = name;
         this.isArchived = isArchived;
         this.id = id;
     }
-    public Channel(){
-    }
 
-    public static Channel fromJson(JSONObject json) throws JSONException {
-        return new Channel(json.getString("name"), json.getBoolean("is_archived"), json.getString("id"));
+    public Channel() {
+        this(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID);
     }
 
     public String getName() {
@@ -45,7 +44,4 @@ public class Channel {
         return isArchived;
     }
 
-    public void setArchived(boolean archived) {
-        isArchived = archived;
-    }
 }

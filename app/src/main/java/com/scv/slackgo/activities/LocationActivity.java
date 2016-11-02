@@ -7,6 +7,7 @@ import android.content.pm.PackageManager;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
+import android.text.TextUtils;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
@@ -274,10 +275,11 @@ public class LocationActivity extends MapActivity implements Observer {
         saveLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                List<String> channelsByName = ChannelListHelper.channelsFromTextViewString(channelsTextView.getText().toString());
                 editLocation.setName(locationName.getText().toString());
-                editLocation.setChannelsByName(channelsByName);
-                editLocation.setChannelsByID(ChannelListHelper.channelsByIDFromTextViewString(channelsByName, channelsList));
+
+                List<Channel> channelsClicked = ChannelListHelper.getChannelsFromTextView(channelsTextView.getText().toString(), channelsList);
+                editLocation.setChannels(channelsClicked);
+
                 if (isValidLocation(editLocation)) {
                     saveLocation();
                 } else {
@@ -344,7 +346,12 @@ public class LocationActivity extends MapActivity implements Observer {
             locationName.setText(locationClicked.getName());
             locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
-            channelsTextView.setText(android.text.TextUtils.join(",", locationClicked.getChannelsByName()));
+
+            List<String> channelsSelected = new ArrayList<String>();
+            for (Channel channel : locationClicked.getChannels()) {
+                channelsSelected.add(channel.getName());
+            }
+            channelsTextView.setText(TextUtils.join(", ", channelsSelected));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {
             float defaultProgress = Constants.DEFAULT_RADIUS_METERS / 10;
@@ -383,7 +390,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private boolean isValidLocation(Location location) {
         boolean isValid = true;
-        if (location.getName().isEmpty() || (location.getChannelsByName().size() == 0)) {
+        if (location.getName().isEmpty() || (location.getChannels().size() == 0)) {
             isValid = false;
             toastMsg = location.getName().isEmpty() ? getString(R.string.empty_location_name) : getString(R.string.no_channels_added);
         } else {

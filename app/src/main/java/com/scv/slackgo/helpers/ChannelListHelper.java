@@ -11,7 +11,6 @@ import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 
 import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.map.HashedMap;
@@ -89,45 +88,25 @@ public class ChannelListHelper {
         return value != null;
     }
 
-    public static List<String> channelsFromTextViewString(String textViewString) {
-        if (!textViewString.equals("")) {
-            return Arrays.asList(textViewString.trim().split(","));
-        } else {
-            return new ArrayList<String>();
-        }
-    }
-
-    //TODO when saving channel in Location as json, this must be removed
-    public static List<String> channelsByIDFromTextViewString(final List<String> channelsByName, List<Channel> channels) {
-        List<Channel> newChannels = channels;
-        CollectionUtils.filter(newChannels, new Predicate<Channel>() {
-            @Override
-            public boolean evaluate(final Channel chan) {
-                boolean hasChannel = IterableUtils.matchesAny(channelsByName, new Predicate<String>() {
-                    public boolean evaluate(String channelName) {
-                        return chan.getName().equals(channelName);
-                    }
-                });
-                return hasChannel;
+    public static List<Channel> getChannelsFromTextView(String textViewString, List<Channel> channelsList) {
+        List<Channel> auxChannelsList = new ArrayList<Channel>();
+        List<String> channelsClicked = textViewString.equals("") ? new ArrayList<String>() : Arrays.asList(textViewString.replace(" ", "").split(","));
+        if (channelsClicked.size() > 0) {
+            for (Channel channel : channelsList) {
+                if (channelsClicked.contains(channel.getName())) {
+                    auxChannelsList.add(channel);
+                }
             }
-        });
 
-        List<String> channelsById = new ArrayList<String>();
-        for (Channel channel : newChannels){
-            channelsById.add(channel.getId());
         }
-        return channelsById;
-
+        return auxChannelsList;
     }
 
-    //TODO when saving channel in Location as json, this must be removed
-    public static Map<String, List<String>>  channelsByNameFromLocations(List<Location> locations){
-        Map<String,List<String>> channelLocationMap = new HashedMap<>();
-
+    public static Map<String, List<Channel>> getChannelsListForLocations(List<Location> locations) {
+        Map<String, List<Channel>> channelLocationMap = new HashedMap<>();
         for (Location loc : locations) {
-            channelLocationMap.put(loc.getName(),loc.getChannelsByName());
+            channelLocationMap.put(loc.getName(), loc.getChannels());
         }
-
         return channelLocationMap;
     }
 

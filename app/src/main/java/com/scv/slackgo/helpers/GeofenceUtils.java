@@ -1,6 +1,7 @@
 package com.scv.slackgo.helpers;
 
 import com.google.android.gms.location.Geofence;
+import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 import com.scv.slackgo.models.LocationsStore;
 
@@ -25,20 +26,20 @@ public class GeofenceUtils {
         return getGeofencesList(locations);
     }
 
-    public static Map<String, List<String>> getChannelsForGeofences(LocationsStore locationsStore, List<Geofence> geofences) {
-        Map<String, List<String>> channelsLocation = new HashedMap<>();
+    public static Map<String, List<Channel>> getChannelsForGeofences(LocationsStore locationsStore, List<Geofence> geofences) {
+        Map<String, List<Channel>> channelsForLocation = new HashedMap<>();
         List<Location> locations = locationsStore.getList();
-        Map<String, List<String>> allChannelsForLocationMap = ChannelListHelper.channelsByNameFromLocations(locations);
+        Map<String, List<Channel>> allChannelsForLocationMap = ChannelListHelper.getChannelsListForLocations(locations);
 
         for (Location loc : locations) {
             for (Geofence geofence : geofences) {
                 if (loc.getName().equals(geofence.getRequestId())) {
-                    channelsLocation.put(loc.getName(), allChannelsForLocationMap.get(loc.getName()));
+                    channelsForLocation.put(loc.getName(), allChannelsForLocationMap.get(loc.getName()));
                 }
 
             }
         }
-        return channelsLocation;
+        return channelsForLocation;
     }
 
     public static Geofence geofenceBuilder(Location loc) {
