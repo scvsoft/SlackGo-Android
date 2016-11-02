@@ -30,13 +30,12 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
+    }
 
-        SupportMapFragment mapFragment = new SupportMapFragment();
-        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
-        fragmentTransaction.replace(channel_map, mapFragment);
-        fragmentTransaction.commit();
-        mapFragment.getMapAsync(this);
-
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initMapFragment();
     }
 
     public abstract int getLayoutId();
@@ -59,5 +58,13 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
 
         this.googleMap.addMarker(markerOptions);
         this.googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(officePosition, location.getCameraZoom()));
+    }
+
+    public void initMapFragment() {
+        SupportMapFragment mapFragment = new SupportMapFragment();
+        FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
+        fragmentTransaction.replace(channel_map, mapFragment);
+        fragmentTransaction.commit();
+        mapFragment.getMapAsync(this);
     }
 }

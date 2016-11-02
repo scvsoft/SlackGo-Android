@@ -33,8 +33,8 @@ import com.google.android.gms.location.GeofencingEvent;
 import com.scv.slackgo.R;
 import com.scv.slackgo.activities.LocationActivity;
 import com.scv.slackgo.helpers.GeofenceUtils;
-import com.scv.slackgo.helpers.Preferences;
 import com.scv.slackgo.models.Channel;
+import com.scv.slackgo.models.LocationsStore;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -49,12 +49,19 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
 
     protected static final String TAG = "GeofenceTransitionsIS";
     private Map<String, List<String>> channelsForLocationMap;
-    private ArrayList<Channel> channelsList;
+    private List<Channel> channelsList;
+    private LocationsStore locationsStore;
 
     public GeofenceTransitionsIntentService() {
         super(TAG);
     }
 
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        locationsStore = LocationsStore.getInstance();
+    }
 
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -66,9 +73,9 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
             return;
         }
         int transitionType = event.getGeofenceTransition();
-        channelsForLocationMap = GeofenceUtils.getChannelsForGeofences(getApplicationContext(), event.getTriggeringGeofences());
+        channelsForLocationMap = GeofenceUtils.getChannelsForGeofences(locationsStore, event.getTriggeringGeofences());
         if (channelsList == null) {
-            channelsList = Preferences.getChannelsList(this);
+            channelsList = locationsStore.getChannelsList();
         }
 
         String msg = "";

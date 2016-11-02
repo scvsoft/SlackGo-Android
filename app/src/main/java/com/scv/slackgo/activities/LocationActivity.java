@@ -30,9 +30,9 @@ import com.scv.slackgo.helpers.Constants;
 import com.scv.slackgo.helpers.ErrorUtils;
 import com.scv.slackgo.helpers.GeofenceUtils;
 import com.scv.slackgo.helpers.GsonUtils;
-import com.scv.slackgo.helpers.Preferences;
 import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
+import com.scv.slackgo.models.LocationsStore;
 import com.scv.slackgo.services.GeofenceService;
 import com.scv.slackgo.services.SlackApiService;
 
@@ -68,6 +68,7 @@ public class LocationActivity extends MapActivity implements Observer {
     private String toastMsg;
     SlackApiService slackService;
     GeofenceService geofenceService;
+    LocationsStore locationsStore;
     PlaceAutocompleteFragment autocompleteFragment;
     ListView channelsListView;
 
@@ -144,7 +145,7 @@ public class LocationActivity extends MapActivity implements Observer {
                 dataAsstrings.add((Channel) object);
             }
             String[] dataArr = new String[dataAsstrings.size()];
-            Preferences.addChannelsToSharedPreferences(LocationActivity.this, dataAsstrings);
+            locationsStore.addChannels(dataAsstrings);
             channelsList = dataAsstrings;
 
         } else {
@@ -212,6 +213,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
         editLocation = new Location(this);
         slackService = new SlackApiService(this);
+        locationsStore = LocationsStore.getInstance();
 
         channelsListView = (ListView) findViewById(R.id.channel_list);
 
@@ -220,10 +222,12 @@ public class LocationActivity extends MapActivity implements Observer {
         String locationsListJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_LIST);
 
         locationClicked = GsonUtils.getObjectFromJson(locationJSON, Location.class);
+
         locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
+        locationsList = locationsList == null ? new ArrayList<Location>() : locationsList;
 
         if (channelsList == null) {
-            channelsList = Preferences.getChannelsList(this);
+            channelsList = locationsStore.getChannelsList();
         }
 
         //Get resources
@@ -238,7 +242,7 @@ public class LocationActivity extends MapActivity implements Observer {
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
-        mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(this, locationsList);
+        mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, locationsList);
     }
 
 
@@ -262,7 +266,7 @@ public class LocationActivity extends MapActivity implements Observer {
         delLocationButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Preferences.deleteLocationFromList(LocationActivity.this, locationClicked, locationsList);
+                locationsStore.deleteLocation(locationClicked);
                 transitionToLocationActivity();
             }
         });
@@ -351,7 +355,7 @@ public class LocationActivity extends MapActivity implements Observer {
     }
 
     private void transitionToLocationActivity() {
-        Intent locationsIntent = new Intent(LocationActivity.this, LocationsListActivity.class);
+        Intent locationsIntent = new Intent(getApplicationContext(), LocationsListActivity.class);
         startActivity(locationsIntent);
         finish();
     }
@@ -359,24 +363,21 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private void saveLocation() {
         if (locationClicked == null) {
-            Preferences.addLocationToSharedPreferences(LocationActivity.this, editLocation);
+            locationsStore.addLocation(editLocation);
             updateGeofencesList(editLocation.getName());
             geofenceService = new GeofenceService(LocationActivity.this, mGeofenceList);
-            transitionToLocationActivity();
         } else {
             editLocation();
         }
+        transitionToLocationActivity();
     }
 
     private void editLocation() {
-
-        locationsList.get(locationsList.indexOf(locationClicked)).setName(locationName.getText().toString());
-        Preferences.removeDataFromSharedPreferences(LocationActivity.this, Constants.INTENT_LOCATION_LIST);
-        Preferences.addLocationsListToSharedPreferences(LocationActivity.this, locationsList);
+        locationsList.remove(locationClicked);
+        locationsList.add(editLocation);
+        locationsStore.updateLocations(locationsList);
         updateGeofencesList(locationClicked.getName());
         geofenceService = new GeofenceService(LocationActivity.this, mGeofenceList);
-        transitionToLocationActivity();
-
     }
 
 
