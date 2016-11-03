@@ -48,7 +48,7 @@ import java.util.Observer;
 public class GeofenceTransitionsIntentService extends IntentService implements Observer {
 
     protected static final String TAG = "GeofenceTransitionsIS";
-    private Map<String, List<String>> channelsForLocationMap;
+    private Map<String, List<Channel>> channelsForLocationMap;
     private List<Channel> channelsList;
     private LocationsStore locationsStore;
 
@@ -134,20 +134,12 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         notificationManager.notify(0, builder.build());
     }
 
-    private String getChannelIdFromName(String channelName) {
-        for (Channel channel : channelsList) {
-            if (channel.getName().equals(channelName))
-                return channel.getId();
-        }
-        return "";
-    }
-
     //Leave channels from geofence in transition
     private void leaveChannelsFromGeofences(List<Geofence> geofences, SlackApiService slackApiService) {
         for (Geofence geofence : geofences) {
-            List<String> channels = channelsForLocationMap.get(geofence.getRequestId());
-            for (String channel : channels) {
-                slackApiService.leaveChannel(getChannelIdFromName(channel));
+            List<Channel> channels = channelsForLocationMap.get(geofence.getRequestId());
+            for (Channel channel : channels) {
+                slackApiService.leaveChannel(channel.getId());
             }
         }
     }
@@ -155,9 +147,9 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
     //Join channels from geofences in transition
     private void joinChannelsFromGeofences(List<Geofence> geofences, SlackApiService slackApiService) {
         for (Geofence geofence : geofences) {
-            List<String> channels = channelsForLocationMap.get(geofence.getRequestId());
-            for (String channel : channels) {
-                slackApiService.joinChannel(channel);
+            List<Channel> channels = channelsForLocationMap.get(geofence.getRequestId());
+            for (Channel channel : channels) {
+                slackApiService.joinChannel(channel.getName());
             }
         }
     }
