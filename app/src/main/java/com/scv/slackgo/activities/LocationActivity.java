@@ -25,6 +25,7 @@ import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
 import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.common.collect.Lists;
 import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.ChannelListHelper;
 import com.scv.slackgo.helpers.Constants;
@@ -39,6 +40,7 @@ import com.scv.slackgo.services.SlackApiService;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
+import org.apache.commons.collections4.Transformer;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
@@ -227,6 +229,7 @@ public class LocationActivity extends MapActivity implements Observer {
 
         locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
         locationsList = locationsList == null ? new ArrayList<Location>() : locationsList;
+        channelsList = new ArrayList<Channel>();
 
         if (channelsList == null) {
             channelsList = locationsStore.getChannelsList();
@@ -278,7 +281,7 @@ public class LocationActivity extends MapActivity implements Observer {
             public void onClick(View v) {
                 editLocation.setName(locationName.getText().toString());
 
-                List<Channel> channelsClicked = ChannelListHelper.getChannelsFromTextView(channelsTextView.getText().toString(), channelsList);
+                List<Channel> channelsClicked = getSelectedChannels();
                 editLocation.setChannels(channelsClicked);
 
                 if (isValidLocation(editLocation)) {
@@ -299,6 +302,9 @@ public class LocationActivity extends MapActivity implements Observer {
 
     public void setSelectedChannels(List<Channel> selectedChannels) {
         this.selectedChannels = selectedChannels;
+    }
+    public List<Channel> getSelectedChannels() {
+        return this.selectedChannels;
     }
 
 
@@ -352,10 +358,14 @@ public class LocationActivity extends MapActivity implements Observer {
             locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
 
-            List<String> channelsSelected = new ArrayList<String>();
-            for (Channel channel : locationClicked.getChannels()) {
-                channelsSelected.add(channel.getName());
-            }
+            selectedChannels = locationClicked.getChannels();
+
+            List<String> channelsSelected = Lists.newArrayList(CollectionUtils.collect(selectedChannels, new Transformer<Channel, String>() {
+                @Override
+                public String transform(Channel channel) {
+                    return channel.getName();
+                }
+            }));
             channelsTextView.setText(TextUtils.join(", ", channelsSelected));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {

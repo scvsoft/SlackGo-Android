@@ -86,7 +86,7 @@ public class ChannelListHelper {
         channelsAlert.show();
     }
 
-    private static ChannelsListAdapter getChannelsAdapter(Activity context, List<Channel> values) {
+    private static ChannelsListAdapter getChannelsAdapter(LocationActivity context, List<Channel> values) {
 
         final List<Channel> selectedValues = getSelectedValues(context, values);
 
@@ -101,14 +101,14 @@ public class ChannelListHelper {
         return new ChannelsListAdapter(context, R.layout.list_layout, filteredValues, selectedValues);
     }
 
-    private static List<Channel> getSelectedValues(Activity context, List<Channel> values) {
+    private static List<Channel> getSelectedValues(LocationActivity context, List<Channel> values) {
 
-        final List<String> selectedChannels = Arrays.asList(((TextView) context.findViewById(R.id.selected_channels)).getText().toString().split(", "));
+        final List<Channel> selectedChannels = context.getSelectedChannels();
 
         return Lists.newArrayList(IterableUtils.filteredIterable(values, new Predicate<Channel>() {
             @Override
             public boolean evaluate(Channel channel) {
-                return isIn(selectedChannels.toArray(new String[0]), channel.getName());
+                return isIn(selectedChannels, channel.getName());
             }
         }));
 
@@ -124,15 +124,6 @@ public class ChannelListHelper {
         return value != null;
     }
 
-    private static boolean isIn(String[] selectedChannels, final String channelName) {
-        String value = IterableUtils.find(Arrays.asList(selectedChannels), new Predicate<String>() {
-            @Override
-            public boolean evaluate(String selectedName) {
-                return channelName.equals(selectedName);
-            }
-        });
-        return value != null;
-    }
 
     private static boolean isIn(Integer[] ids, final int id) {
         Integer value = IterableUtils.find(Arrays.asList(ids), new Predicate<Integer>() {
@@ -142,20 +133,6 @@ public class ChannelListHelper {
             }
         });
         return value != null;
-    }
-
-    public static List<Channel> getChannelsFromTextView(String textViewString, List<Channel> channelsList) {
-        List<Channel> auxChannelsList = new ArrayList<Channel>();
-        List<String> channelsClicked = textViewString.equals("") ? new ArrayList<String>() : Arrays.asList(textViewString.replace(" ", "").split(","));
-        if (channelsClicked.size() > 0) {
-            for (Channel channel : channelsList) {
-                if (channelsClicked.contains(channel.getName())) {
-                    auxChannelsList.add(channel);
-                }
-            }
-
-        }
-        return auxChannelsList;
     }
 
     public static Map<String, List<Channel>> getChannelsListForLocations(List<Location> locations) {
