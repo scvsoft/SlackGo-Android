@@ -6,7 +6,9 @@ import android.content.DialogInterface;
 import android.widget.ListView;
 import android.widget.TextView;
 
+import com.google.common.collect.Lists;
 import com.scv.slackgo.R;
+import com.scv.slackgo.activities.LocationActivity;
 import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.Location;
 
@@ -26,7 +28,9 @@ import java.util.Map;
 
 public class ChannelListHelper {
 
-    public static void buildList(final Activity context, final List<Channel> values, ListView channelsListView) {
+    static List<Channel> filteredValues;
+
+    public static void buildList(final LocationActivity context,final List<Channel> values, ListView channelsListView) {
 
         channelsListView.setChoiceMode(ListView.CHOICE_MODE_MULTIPLE);
         channelsListView.setItemsCanFocus(false);
@@ -51,6 +55,7 @@ public class ChannelListHelper {
                         Integer[] channelIds = adapter.getItemsChecked();
 
                         String concatChannels = "";
+                        List<Channel> selectedChannels = new ArrayList<Channel>();
 
                         for (int i = 0; i < values.size(); i++) {
                             if (isIn(channelIds, i)) {
@@ -58,14 +63,18 @@ public class ChannelListHelper {
                                     concatChannels = concatChannels.concat(", ");
                                 }
                                 concatChannels = concatChannels.concat(values.get(i).getName());
+                                selectedChannels.add(values.get(i));
                             }
                         }
+
                         IterableUtils.forEach(values, new Closure<Channel>() {
                             @Override
                             public void execute(Channel input) {
 
                             }
                         });
+
+                        context.setSelectedChannels(selectedChannels);
 
                         ((TextView) context.findViewById(R.id.selected_channels)).setText(concatChannels);
                     }
@@ -81,28 +90,28 @@ public class ChannelListHelper {
 
         final List<Channel> selectedValues = getSelectedValues(context, values);
 
-        CollectionUtils.filter(values, new Predicate<Channel>() {
+
+        filteredValues = Lists.newArrayList(IterableUtils.filteredIterable(values, new Predicate<Channel>() {
             @Override
             public boolean evaluate(Channel channel) {
                 return !isIn(selectedValues, channel.getName());
             }
-        });
+        }));
 
-        return new ChannelsListAdapter(context, R.layout.list_layout, values, selectedValues);
+        return new ChannelsListAdapter(context, R.layout.list_layout, filteredValues, selectedValues);
     }
 
     private static List<Channel> getSelectedValues(Activity context, List<Channel> values) {
 
         final List<String> selectedChannels = Arrays.asList(((TextView) context.findViewById(R.id.selected_channels)).getText().toString().split(", "));
 
-        CollectionUtils.filter(values, new Predicate<Channel>() {
+        return Lists.newArrayList(IterableUtils.filteredIterable(values, new Predicate<Channel>() {
             @Override
             public boolean evaluate(Channel channel) {
                 return isIn(selectedChannels.toArray(new String[0]), channel.getName());
             }
-        });
+        }));
 
-        return values;
     }
 
     private static boolean isIn(List<Channel> selectedChannels, final String channelName) {

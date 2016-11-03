@@ -56,7 +56,7 @@ class ChannelsListAdapter extends ArrayAdapter<Channel> {
         checkBoxState = new boolean[unSelectedChannels.size()];
 
         for(int i=0; i < channels.length; i++) {
-            checkBoxState[i] = isIn(selectedChannels, channels[0]);
+            checkBoxState[i] = isIn(selectedChannels, channels[i]);
         }
     }
 

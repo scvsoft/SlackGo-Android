@@ -66,6 +66,7 @@ public class LocationActivity extends MapActivity implements Observer {
     private Location editLocation;
     private List<Location> locationsList;
     private List<Channel> channelsList;
+    private List<Channel> selectedChannels;
     private String toastMsg;
     SlackApiService slackService;
     GeofenceService geofenceService;
@@ -294,6 +295,10 @@ public class LocationActivity extends MapActivity implements Observer {
             }
 
         });
+    }
+
+    public void setSelectedChannels(List<Channel> selectedChannels) {
+        this.selectedChannels = selectedChannels;
     }
 
 
