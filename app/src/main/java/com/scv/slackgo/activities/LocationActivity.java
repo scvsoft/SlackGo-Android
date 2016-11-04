@@ -20,11 +20,10 @@ import android.widget.Toast;
 
 
 import com.google.android.gms.location.Geofence;
-// TODO fix this for new library
-//import com.google.android.gms.common.api.Status;
-//import com.google.android.gms.location.places.Place;
-//import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
-//import com.google.android.gms.location.places.ui.PlaceSelectionListener;
+import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.places.Place;
+import com.google.android.gms.location.places.ui.PlaceAutocompleteFragment;
+import com.google.android.gms.location.places.ui.PlaceSelectionListener;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.common.collect.Lists;
@@ -76,7 +75,7 @@ public class LocationActivity extends MapActivity implements Observer {
     GeofenceService geofenceService;
     LocationsStore locationsStore;
     // TODO fix this for new library
-    // PlaceAutocompleteFragment autocompleteFragment;
+     PlaceAutocompleteFragment autocompleteFragment;
     ListView channelsListView;
 
     protected List<Geofence> mGeofenceList;
@@ -247,9 +246,8 @@ public class LocationActivity extends MapActivity implements Observer {
         delLocationButton = (Button) findViewById(R.id.del_location_button);
         addChannelsButton = (Button) findViewById(R.id.add_channels);
         locationSeekBar.setMax(100);
-        // TODO fix this for new library
-//        autocompleteFragment = (PlaceAutocompleteFragment)
-//                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
         mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, locationsList);
     }
@@ -257,18 +255,18 @@ public class LocationActivity extends MapActivity implements Observer {
 
     private void addSearchListener() {
         // TODO fix this for new library
-//        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-//            @Override
-//            public void onPlaceSelected(Place place) {
-//                editLocation = new Location(place.getLatLng());
-//                setMarker(editLocation);
-//            }
-//
-//            @Override
-//            public void onError(Status status) {
-//                ErrorUtils.showErrorAlert(LocationActivity.this);
-//            }
-//        });
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                editLocation = new Location(place.getLatLng());
+                setMarker(editLocation);
+            }
+
+            @Override
+            public void onError(Status status) {
+                ErrorUtils.showErrorAlert(LocationActivity.this);
+            }
+        });
     }
 
 
