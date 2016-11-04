@@ -47,12 +47,14 @@ public class Location {
 
     public static Location getSCVLocation() {
         return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT,
-                Constants.SCV_OFFICE_LONG, 100, 15.0f,
+                Constants.SCV_OFFICE_LONG, Constants.DEFAULT_RADIUS_METERS, Constants.DEFAULT_CAMERA_ZOOM,
                 new ArrayList<Channel>(Arrays.asList(new Channel(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID))));
     }
 
     public Location(LatLng location) {
-        this("Location 1", location.latitude, location.longitude, 100, 15.0f, new ArrayList<Channel>(Arrays.asList(new Channel())));
+        this("Location 1", location.latitude, location.longitude,
+                Constants.DEFAULT_RADIUS_METERS, Constants.DEFAULT_CAMERA_ZOOM,
+                new ArrayList<Channel>(Arrays.asList(new Channel())));
     }
 
     public String getName() {

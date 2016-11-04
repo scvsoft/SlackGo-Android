@@ -46,6 +46,8 @@ public class LocationsListActivity extends MapActivity {
     @Override
     protected void onResume() {
         super.onResume();
+        //initMap again for load the region added.
+        initMapFragment();
         loadLocationsList();
         setListView();
     }
@@ -65,7 +67,6 @@ public class LocationsListActivity extends MapActivity {
 
     private void setListView() {
         listView = (ListView) findViewById(R.id.list);
-
         listView.setAdapter(getAdapter());
 
         listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {

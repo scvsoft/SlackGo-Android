@@ -14,7 +14,6 @@ import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ListView;
-import android.widget.SeekBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -42,7 +41,6 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
 import org.apache.commons.collections4.Transformer;
 
-import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Observable;
@@ -56,8 +54,6 @@ public class LocationActivity extends MapActivity implements Observer {
 
     protected static final String TAG = "LocationActivity";
 
-
-    private SeekBar locationSeekBar;
     private TextView locationRadiusValue;
     private TextView channelsTextView;
     private EditText locationName;
@@ -88,8 +84,6 @@ public class LocationActivity extends MapActivity implements Observer {
         checkUserPermissions();
 
         setDetailValues();
-
-        addLocationBarListener();
 
         addCRUDButtonsListener();
 
@@ -236,14 +230,12 @@ public class LocationActivity extends MapActivity implements Observer {
         }
 
         //Get resources
-        locationSeekBar = (SeekBar) findViewById(R.id.location_radius_seek_bar);
         locationRadiusValue = (TextView) findViewById(R.id.location_radius_value);
         locationName = (EditText) findViewById(R.id.location_name);
         channelsTextView = (TextView) findViewById(R.id.selected_channels);
         saveLocationButton = (Button) findViewById(R.id.save_location_button);
         delLocationButton = (Button) findViewById(R.id.del_location_button);
         addChannelsButton = (Button) findViewById(R.id.add_channels);
-        locationSeekBar.setMax(100);
         autocompleteFragment = (PlaceAutocompleteFragment)
                 getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
 
@@ -303,36 +295,10 @@ public class LocationActivity extends MapActivity implements Observer {
     public void setSelectedChannels(List<Channel> selectedChannels) {
         this.selectedChannels = selectedChannels;
     }
+
     public List<Channel> getSelectedChannels() {
         return this.selectedChannels;
     }
-
-
-    private void addLocationBarListener() {
-        locationSeekBar.setOnSeekBarChangeListener(new SeekBar.OnSeekBarChangeListener() {
-
-            @Override
-            public void onStopTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onStartTrackingTouch(SeekBar seekBar) {
-            }
-
-            @Override
-            public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
-                if (fromUser) {
-                    if (progress >= 0 && progress <= locationSeekBar.getMax()) {
-                        String progressString = String.valueOf(progress * 10);
-                        locationRadiusValue.setText(progressString);
-                        seekBar.setProgress(progress);
-                        circle.setRadius(progress * 10);
-                    }
-                }
-            }
-        });
-    }
-
 
     private void addLocationNameEnterListener() {
         locationName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
@@ -355,7 +321,6 @@ public class LocationActivity extends MapActivity implements Observer {
 
         if (locationClicked != null) {
             locationName.setText(locationClicked.getName());
-            locationSeekBar.setProgress(new BigDecimal(locationClicked.getRadius() / 10).intValue());
             locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
 
             selectedChannels = locationClicked.getChannels();
@@ -369,8 +334,6 @@ public class LocationActivity extends MapActivity implements Observer {
             channelsTextView.setText(TextUtils.join(", ", channelsSelected));
             delLocationButton.setVisibility(View.VISIBLE);
         } else {
-            float defaultProgress = Constants.DEFAULT_RADIUS_METERS / 10;
-            locationSeekBar.setProgress(Math.round(defaultProgress));
             locationRadiusValue.setText(String.valueOf(Constants.DEFAULT_RADIUS_METERS));
             delLocationButton.setVisibility(View.GONE);
         }
@@ -430,7 +393,6 @@ public class LocationActivity extends MapActivity implements Observer {
             }
         });
         mGeofenceList.add(newLocationGeofence);
-
     }
 
 }
