@@ -34,12 +34,12 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(getLayoutId());
+        initMapFragment();
     }
 
     @Override
     protected void onResume() {
         super.onResume();
-        initMapFragment();
     }
 
     public abstract int getLayoutId();
