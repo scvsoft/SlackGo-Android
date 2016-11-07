@@ -28,8 +28,8 @@ public class Location {
         this.longitude = location.getLongitude();
         this.latitude = location.getLatitude();
         */
-        this.longitude = Constants.SCV_OFFICE_LONG;
-        this.latitude = Constants.SCV_OFFICE_LAT;
+        this.longitude = Constants.DEFAULT_LONG;
+        this.latitude = Constants.DEFAULT_LAT;
         this.name = "";
         this.radius = Constants.DEFAULT_RADIUS_METERS;
         this.cameraZoom = Constants.DEFAULT_CAMERA_ZOOM;
