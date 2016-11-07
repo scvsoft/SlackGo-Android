@@ -119,8 +119,7 @@ public class LocationActivity extends MapActivity implements Observer {
         if (locationClicked != null) {
             this.setMarker(locationClicked);
         } else {
-            Location officeLocation = Location.getSCVLocation();
-            this.setMarker(officeLocation);
+            this.setMarker(editLocation);
         }
 
 

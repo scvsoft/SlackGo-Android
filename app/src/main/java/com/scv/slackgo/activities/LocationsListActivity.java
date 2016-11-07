@@ -67,21 +67,25 @@ public class LocationsListActivity extends MapActivity {
 
     private void setListView() {
         listView = (ListView) findViewById(R.id.list);
-        listView.setAdapter(getAdapter());
+        if (locationsList.size()>0) {
+            listView.setAdapter(getAdapter());
+            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+                @Override
+                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                    Location locationClicked = locationsList.get(position);
+                    String locationJSON = GsonUtils.getJsonFromObject(locationClicked);
+                    String locationsListJSON = GsonUtils.getJsonFromObject(locationsList);
 
-        listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-            @Override
-            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Location locationClicked = locationsList.get(position);
-                String locationJSON = GsonUtils.getJsonFromObject(locationClicked);
-                String locationsListJSON = GsonUtils.getJsonFromObject(locationsList);
+                    Intent locationIntent = new Intent(getApplicationContext(), LocationActivity.class);
+                    locationIntent.putExtra(Constants.INTENT_LOCATION_CLICKED, locationJSON);
+                    locationIntent.putExtra(Constants.INTENT_LOCATION_LIST, locationsListJSON);
+                    startActivity(locationIntent);
+                }
+            });
+        } else {
+            listView.setAdapter(null);
 
-                Intent locationIntent = new Intent(getApplicationContext(), LocationActivity.class);
-                locationIntent.putExtra(Constants.INTENT_LOCATION_CLICKED, locationJSON);
-                locationIntent.putExtra(Constants.INTENT_LOCATION_LIST, locationsListJSON);
-                startActivity(locationIntent);
-            }
-        });
+        }
     }
 
     @Override
@@ -129,16 +133,15 @@ public class LocationsListActivity extends MapActivity {
         this.googleMap.getUiSettings().setCompassEnabled(true);
         locationsList = locationsStore.getList();
 
-        IterableUtils.forEach(locationsList, new Closure<Location>() {
-            @Override
-            public void execute(Location loc) {
-                setMarker(loc);
-            }
-        });
-
-        if (locationsList == null) {
-            //TODO change SCV to Default location anywhere.
-            this.setMarker(Location.getSCVLocation());
+        if ((locationsList == null) || (locationsList.size()==0)) {
+            this.setMarker(new Location(this));
+        } else {
+            IterableUtils.forEach(locationsList, new Closure<Location>() {
+                @Override
+                public void execute(Location loc) {
+                    setMarker(loc);
+                }
+            });
         }
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
