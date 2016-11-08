@@ -4,7 +4,6 @@ import android.Manifest;
 import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.text.TextUtils;
@@ -36,6 +35,9 @@ import com.scv.slackgo.models.Location;
 import com.scv.slackgo.models.LocationsStore;
 import com.scv.slackgo.services.GeofenceService;
 import com.scv.slackgo.services.SlackApiService;
+import com.scv.slackgo.services.listeners.ChannelsListListener;
+import com.scv.slackgo.services.listeners.SlackTokenListener;
+import com.scv.slackgo.services.listeners.TeamNameListener;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -43,17 +45,20 @@ import org.apache.commons.collections4.Transformer;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 /**
  * Created by kado on 10/11/16.
  */
 
-public class LocationActivity extends MapActivity implements Observer {
+public class LocationActivity extends MapActivity {
 
     protected static final String TAG = "LocationActivity";
-
+    protected List<Geofence> mGeofenceList;
+    SlackApiService slackService;
+    GeofenceService geofenceService;
+    LocationsStore locationsStore;
+    PlaceAutocompleteFragment autocompleteFragment;
+    ListView channelsListView;
     private TextView locationRadiusValue;
     private TextView channelsTextView;
     private EditText locationName;
@@ -66,20 +71,14 @@ public class LocationActivity extends MapActivity implements Observer {
     private List<Channel> channelsList;
     private List<Channel> selectedChannels;
     private String toastMsg;
-    SlackApiService slackService;
-    GeofenceService geofenceService;
-    LocationsStore locationsStore;
-    PlaceAutocompleteFragment autocompleteFragment;
-    ListView channelsListView;
-
-    protected List<Geofence> mGeofenceList;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         initializeVariables();
+
+        getLayoutResources();
 
         checkUserPermissions();
 
@@ -90,17 +89,6 @@ public class LocationActivity extends MapActivity implements Observer {
         addSearchListener();
 
         addLocationNameEnterListener();
-
-        String slackCode = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
-
-        if (slackCode == null) {
-            String code = getIntent().getData().getQueryParameters("code").get(0);
-            slackService.getSlackToken(String.format(getString(R.string.slack_token_url),
-                    getString(R.string.client_id), getString(R.string.client_secret), code, getString(R.string.redirect_oauth)));
-        } else {
-            slackService.getAvailableChannels();
-        }
-
     }
 
 
@@ -115,41 +103,19 @@ public class LocationActivity extends MapActivity implements Observer {
         googleMap.getUiSettings().setZoomControlsEnabled(true);
         googleMap.getUiSettings().setCompassEnabled(true);
 
-        this.googleMap.clear();
-        if (locationClicked != null) {
-            this.setMarker(locationClicked);
-        } else {
-            this.setMarker(editLocation);
-        }
-
+        clearMap();
+        this.setMarker(editLocation);
 
         this.googleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
             @Override
             public void onMapClick(LatLng latLng) {
-                googleMap.clear();
+                clearMap();
                 editLocation.setLatitude(latLng.latitude);
                 editLocation.setLongitude(latLng.longitude);
                 setMarker(editLocation);
             }
         });
     }
-
-    @Override
-    public void update(Observable observable, Object data) {
-        if (data != null) {
-            List<Channel> dataAsstrings = new ArrayList<Channel>(((ArrayList<Object>) data).size());
-            for (Object object : (ArrayList<Object>) data) {
-                dataAsstrings.add((Channel) object);
-            }
-            String[] dataArr = new String[dataAsstrings.size()];
-            locationsStore.addChannels(dataAsstrings);
-            channelsList = dataAsstrings;
-
-        } else {
-            slackService.getAvailableChannels();
-        }
-    }
-
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
@@ -178,6 +144,41 @@ public class LocationActivity extends MapActivity implements Observer {
         }
     }
 
+    private void initializeVariables() {
+
+        slackService = new SlackApiService(this);
+        locationsStore = LocationsStore.getInstance();
+
+        channelsListView = (ListView) findViewById(R.id.channel_list);
+
+        Intent myIntent = getIntent();
+        String locationJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_CLICKED);
+        String locationsListJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_LIST);
+
+        locationClicked = GsonUtils.getObjectFromJson(locationJSON, Location.class);
+        editLocation = (locationClicked == null) ? new Location(this) : locationClicked;
+
+        locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
+        locationsList = locationsList == null ? new ArrayList<Location>() : locationsList;
+        channelsList = new ArrayList<Channel>();
+        channelsList = locationsStore.getChannelsList();
+
+        mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, locationsList);
+
+        slackServiceActions();
+    }
+
+    private void getLayoutResources(){
+        locationRadiusValue = (TextView) findViewById(R.id.location_radius_value);
+        locationName = (EditText) findViewById(R.id.location_name);
+        channelsTextView = (TextView) findViewById(R.id.selected_channels);
+        saveLocationButton = (Button) findViewById(R.id.save_location_button);
+        delLocationButton = (Button) findViewById(R.id.del_location_button);
+        addChannelsButton = (Button) findViewById(R.id.add_channels);
+        autocompleteFragment = (PlaceAutocompleteFragment)
+                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
+    }
+
     private void checkUserPermissions() {
 
         List<String> permission = new ArrayList<>();
@@ -193,70 +194,30 @@ public class LocationActivity extends MapActivity implements Observer {
             ActivityCompat.requestPermissions(this,
                     permission.toArray(new String[0]),
                     Constants.RC_ASK_PERMISSIONS);
+        }
+    }
+
+    private void setDetailValues() {
+
+        if (locationClicked != null) {
+            locationName.setText(locationClicked.getName());
+            locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
+
+            selectedChannels = locationClicked.getChannels();
+
+            List<String> channelsSelected = Lists.newArrayList(CollectionUtils.collect(selectedChannels, new Transformer<Channel, String>() {
+                @Override
+                public String transform(Channel channel) {
+                    return channel.getName();
+                }
+            }));
+            channelsTextView.setText(TextUtils.join(", ", channelsSelected));
+            delLocationButton.setVisibility(View.VISIBLE);
         } else {
-            LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-            android.location.Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-            if (location == null) {
-                editLocation.setLatitude(Constants.DEFAULT_LAT);
-                editLocation.setLongitude(Constants.DEFAULT_LONG);
-            } else {
-                editLocation.setLongitude(location.getLongitude());
-                editLocation.setLatitude(location.getLatitude());
-            }
+            locationRadiusValue.setText(String.valueOf(Constants.DEFAULT_RADIUS_METERS));
+            delLocationButton.setVisibility(View.GONE);
         }
     }
-
-    private void initializeVariables() {
-
-        editLocation = new Location(this);
-        slackService = new SlackApiService(this);
-        locationsStore = LocationsStore.getInstance();
-
-        channelsListView = (ListView) findViewById(R.id.channel_list);
-
-        Intent myIntent = getIntent();
-        String locationJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_CLICKED);
-        String locationsListJSON = myIntent.getStringExtra(Constants.INTENT_LOCATION_LIST);
-
-        locationClicked = GsonUtils.getObjectFromJson(locationJSON, Location.class);
-
-        locationsList = GsonUtils.getListFromJson(locationsListJSON, Location[].class);
-        locationsList = locationsList == null ? new ArrayList<Location>() : locationsList;
-        channelsList = new ArrayList<Channel>();
-
-        if (channelsList == null) {
-            channelsList = locationsStore.getChannelsList();
-        }
-
-        //Get resources
-        locationRadiusValue = (TextView) findViewById(R.id.location_radius_value);
-        locationName = (EditText) findViewById(R.id.location_name);
-        channelsTextView = (TextView) findViewById(R.id.selected_channels);
-        saveLocationButton = (Button) findViewById(R.id.save_location_button);
-        delLocationButton = (Button) findViewById(R.id.del_location_button);
-        addChannelsButton = (Button) findViewById(R.id.add_channels);
-        autocompleteFragment = (PlaceAutocompleteFragment)
-                getFragmentManager().findFragmentById(R.id.place_autocomplete_fragment);
-
-        mGeofenceList = GeofenceUtils.getGeofencesListFromLocations(locationsStore, locationsList);
-    }
-
-
-    private void addSearchListener() {
-        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
-            @Override
-            public void onPlaceSelected(Place place) {
-                editLocation = new Location(place.getLatLng());
-                setMarker(editLocation);
-            }
-
-            @Override
-            public void onError(Status status) {
-                ErrorUtils.showErrorAlert(LocationActivity.this);
-            }
-        });
-    }
-
 
     private void addCRUDButtonsListener() {
         delLocationButton.setOnClickListener(new View.OnClickListener() {
@@ -291,12 +252,21 @@ public class LocationActivity extends MapActivity implements Observer {
         });
     }
 
-    public void setSelectedChannels(List<Channel> selectedChannels) {
-        this.selectedChannels = selectedChannels;
-    }
+    private void addSearchListener() {
+        autocompleteFragment.setOnPlaceSelectedListener(new PlaceSelectionListener() {
+            @Override
+            public void onPlaceSelected(Place place) {
+                editLocation.setLatitude(place.getLatLng().latitude);
+                editLocation.setLongitude(place.getLatLng().longitude);
+                setMarker(editLocation);
+            }
 
-    public List<Channel> getSelectedChannels() {
-        return this.selectedChannels;
+            @Override
+            public void onError(Status status) {
+
+                ErrorUtils.showErrorAlert(LocationActivity.this);
+            }
+        });
     }
 
     private void addLocationNameEnterListener() {
@@ -316,26 +286,73 @@ public class LocationActivity extends MapActivity implements Observer {
         });
     }
 
-    private void setDetailValues() {
+    //Get slack info for channels and user team
+    private void slackServiceActions() {
+        String slackCode = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
+        if (slackCode == null) {
+            String code = getIntent().getData().getQueryParameters("code").get(0);
+            String slackUrl = String.format(getString(R.string.slack_token_url),
+                    getString(R.string.client_id), getString(R.string.client_secret), code, getString(R.string.redirect_oauth));
 
-        if (locationClicked != null) {
-            locationName.setText(locationClicked.getName());
-            locationRadiusValue.setText(String.valueOf(locationClicked.getRadius() * 10));
-
-            selectedChannels = locationClicked.getChannels();
-
-            List<String> channelsSelected = Lists.newArrayList(CollectionUtils.collect(selectedChannels, new Transformer<Channel, String>() {
+            slackService.getSlackToken(slackUrl, new SlackTokenListener() {
                 @Override
-                public String transform(Channel channel) {
-                    return channel.getName();
+                public void onResponse() {
+                    setChannelsListFromService();
+                    setLocationToTeam();
                 }
-            }));
-            channelsTextView.setText(TextUtils.join(", ", channelsSelected));
-            delLocationButton.setVisibility(View.VISIBLE);
+
+                @Override
+                public void onError(Context context) {
+                    ErrorUtils.showErrorAlert(context);
+                }
+            });
         } else {
-            locationRadiusValue.setText(String.valueOf(Constants.DEFAULT_RADIUS_METERS));
-            delLocationButton.setVisibility(View.GONE);
+            setChannelsListFromService();
+            if (locationClicked == null) {
+                setLocationToTeam();
+            }
+
         }
+    }
+
+    private void setChannelsListFromService() {
+        slackService.getAvailableChannels(new ChannelsListListener() {
+            @Override
+            public void onResponse(List<Channel> channels) {
+                channelsList = channels;
+            }
+
+            @Override
+            public void onError(Context context) {
+                ErrorUtils.showErrorAlert(context);
+            }
+        });
+    }
+
+    private void setLocationToTeam() {
+        slackService.getTeam(new TeamNameListener() {
+            @Override
+            public void onResponse(String team) {
+                if (team.equals(Constants.SLACK_SCV_TEAM)) {
+                    editLocation = Location.getSCVLocation();
+                    clearMap();
+                    setMarker(editLocation);
+                }
+            }
+
+            @Override
+            public void onError(Context context) {
+                ErrorUtils.showErrorAlert(context);
+            }
+        });
+    }
+
+    public List<Channel> getSelectedChannels() {
+        return this.selectedChannels;
+    }
+
+    public void setSelectedChannels(List<Channel> selectedChannels) {
+        this.selectedChannels = selectedChannels;
     }
 
     private void transitionToLocationActivity() {
@@ -393,5 +410,4 @@ public class LocationActivity extends MapActivity implements Observer {
         });
         mGeofenceList.add(newLocationGeofence);
     }
-
 }

@@ -78,6 +78,10 @@ public abstract class MapActivity extends AppCompatActivity implements OnMapRead
         this.googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(officePosition, location.getCameraZoom()));
     }
 
+    public void clearMap() {
+        this.googleMap.clear();
+    }
+
     public void initMapFragment() {
         SupportMapFragment mapFragment = new SupportMapFragment();
         FragmentTransaction fragmentTransaction = getSupportFragmentManager().beginTransaction();
