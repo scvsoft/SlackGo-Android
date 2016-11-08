@@ -12,9 +12,11 @@ import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
 import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.Constants;
-import com.scv.slackgo.helpers.ErrorUtils;
 import com.scv.slackgo.helpers.GsonUtils;
 import com.scv.slackgo.models.Channel;
+import com.scv.slackgo.services.listeners.ChannelsListListener;
+import com.scv.slackgo.services.listeners.SlackTokenListener;
+import com.scv.slackgo.services.listeners.TeamNameListener;
 
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.Predicate;
@@ -24,26 +26,22 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Observable;
-import java.util.Observer;
 
 
 /**
  * Created by ayelen@scvsoft.com on 10/12/16.
  */
 
-public class SlackApiService extends Observable implements APIInterface {
+public class SlackApiService implements APIInterface {
 
     protected static final String TAG = "GeofenceTransitionsIS";
 
 
     private RequestQueue queue;
     private Context context;
-    //private ArrayList<String> channelsName;
 
     public SlackApiService(Context context) {
         this.context = context;
-        this.addObserver((Observer) context);
         queue = Volley.newRequestQueue(context);
     }
 
@@ -94,7 +92,7 @@ public class SlackApiService extends Observable implements APIInterface {
     }
 
     @Override
-    public void getAvailableChannels() {
+    public void getAvailableChannels(final ChannelsListListener listener) {
 
         String slackToken = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
         String url = String.format(context.getString(R.string.slack_channels_url), slackToken);
@@ -105,22 +103,52 @@ public class SlackApiService extends Observable implements APIInterface {
                     public void onResponse(String response) {
                         try {
                             JSONArray listOfChannelsAsJSON = new JSONObject(response).getJSONArray("channels");
-                            getChannelsName(listOfChannelsAsJSON);
+                            listener.onResponse(getChannels(listOfChannelsAsJSON));
+
                         } catch (JSONException e) {
-                            ErrorUtils.showErrorAlert(context);
+                            listener.onError(context);
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        ErrorUtils.showErrorAlert(context);
+                        listener.onError(context);
                     }
                 });
         queue.add(request);
     }
 
-    public void getSlackToken(String url) {
+
+    public void getTeam(final TeamNameListener listener) {
+        String slackToken = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
+        String url = String.format(context.getString(R.string.slack_team_info), slackToken);
+
+        StringRequest request = new StringRequest(Request.Method.GET, url,
+                new Response.Listener<String>() {
+                    @Override
+                    public void onResponse(String response) {
+                        try {
+                            JSONObject object = new JSONObject(response);
+                            String teamName = object.getJSONObject("team").getString("name");
+                            listener.onResponse(teamName);
+
+                        } catch (JSONException e) {
+                            listener.onError(context);
+                        }
+                    }
+                },
+                new Response.ErrorListener() {
+                    @Override
+                    public void onErrorResponse(VolleyError error) {
+                        listener.onError(context);
+                    }
+                });
+        queue.add(request);
+    }
+
+
+    public void getSlackToken(String url, final SlackTokenListener listener) {
 
         StringRequest request = new StringRequest(Request.Method.GET, url,
                 new Response.Listener<String>() {
@@ -129,15 +157,16 @@ public class SlackApiService extends Observable implements APIInterface {
                         try {
                             JSONObject responseToJson = new JSONObject(response);
                             addTokenToPreferences(responseToJson);
+                            listener.onResponse();
                         } catch (JSONException e) {
-                            ErrorUtils.showErrorAlert(context);
+                            listener.onError(context);
                         }
                     }
                 },
                 new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        ErrorUtils.showErrorAlert(context);
+                        listener.onError(context);
                     }
                 });
         queue.add(request);
@@ -148,17 +177,14 @@ public class SlackApiService extends Observable implements APIInterface {
         SharedPreferences.Editor editor = context.getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, context.MODE_PRIVATE).edit();
         editor.putString(Constants.SLACK_TOKEN, responseToJson.getString("access_token"));
         editor.commit();
-        setChanged();
-        notifyObservers();
     }
 
-    private void getChannelsName(JSONArray listOfChannelsAsJSON) throws JSONException {
+    private List<Channel> getChannels(JSONArray listOfChannelsAsJSON) throws JSONException {
 
         List<Channel> channels = new ArrayList<>();
         for (int i = 0; i < listOfChannelsAsJSON.length(); i++) {
             channels.add(GsonUtils.setObject(new Channel(), listOfChannelsAsJSON.getJSONObject(i)));
         }
-
 
         CollectionUtils.filter(channels, new Predicate<Channel>() {
             @Override
@@ -166,15 +192,6 @@ public class SlackApiService extends Observable implements APIInterface {
                 return !channel.isArchived();
             }
         });
-
-        /*
-        channelsName = new ArrayList<>(CollectionUtils.collect(channels, new Transformer<Channel, String>() {
-            public String transform(Channel channel) {
-                return channel.getName();
-            }
-        }));
-        */
-        setChanged();
-        notifyObservers(channels);
+        return channels;
     }
 }

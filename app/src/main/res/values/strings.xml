@@ -30,7 +30,8 @@
     <string name="slack_channels_url">https://slack.com/api/channels.list?token=%1$s</string>
     <string name="slack_channel_join">https://slack.com/api/channels.join?token=%1$s&amp;name=%2$s</string>
     <string name="slack_channel_leave">https://slack.com/api/channels.leave?token=%1$s&amp;channel=%2$s</string>
-    <string name="slack_scope">channels:write</string>
+    <string name="slack_team_info">https://slack.com/api/team.info?token=%1$s</string>
+    <string name="slack_scope">channels:write,team:read</string>
     <string name="slack_token">slackToken</string>
 
     <!--GEOFENCING ERROR MESSAGES-->
