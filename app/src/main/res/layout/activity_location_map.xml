@@ -1,0 +1,102 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/bg"
+    tools:context="com.scv.slackgo.activities.LocationsListActivity">
+
+    <FrameLayout
+        android:id="@+id/channel_map"
+        android:name="com.google.android.gms.maps.SupportMapFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/gradient_height"
+        android:background="@drawable/down_gradient"
+        android:clickable="false"
+        android:gravity="top|center"
+        android:orientation="vertical"
+        android:paddingTop="@dimen/small">
+
+        <TextView
+            android:id="@+id/first_location"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/medium"
+            android:gravity="center|top"
+            android:text="@string/create_first_location"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_large" />
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:orientation="horizontal">
+
+            <ImageButton
+                android:layout_width="@dimen/btn_side"
+                android:layout_height="@dimen/btn_side"
+                android:layout_marginTop="@dimen/searcher_margin_top"
+                android:background="@android:color/transparent"
+                android:onClick="searchLocationClicked"
+                android:scaleType="fitCenter"
+                android:src="@drawable/ic_search" />
+        </LinearLayout>
+
+        <TextView
+            android:id="@+id/map_location_address"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="@dimen/address_margin_top"
+            android:text="@string/location"
+            android:textAlignment="center"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_medium" />
+    </LinearLayout>
+
+    <RelativeLayout
+        android:id="@+id/slackButton"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/gradient_height"
+        android:layout_gravity="bottom"
+        android:background="@drawable/up_gradient"
+        android:clickable="false"
+        android:orientation="vertical">
+
+        <EditText
+            android:id="@+id/location_name"
+            android:layout_width="wrap_content"
+            android:layout_height="@dimen/login_button_height"
+            android:layout_centerInParent="true"
+            android:background="@android:color/transparent"
+            android:gravity="center"
+            android:hint="@string/location_hint"
+            android:textColor="@color/white"
+            android:textColorHint="@color/hintWhite"
+            android:textCursorDrawable="@drawable/white_cursor"
+            android:textSize="@dimen/font_medium" />
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/login_button_height"
+            android:layout_alignParentBottom="true"
+            android:layout_marginBottom="@dimen/small"
+            android:layout_marginLeft="@dimen/small"
+            android:layout_marginRight="@dimen/small"
+            android:background="@color/colorPrimary"
+            android:clickable="true"
+            android:onClick="addLocationDetails">
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:gravity="center"
+                android:text="@string/save"
+                android:textColor="@color/white"
+                android:textSize="@dimen/font_large" />
+        </LinearLayout>
+    </RelativeLayout>
+
+</FrameLayout>

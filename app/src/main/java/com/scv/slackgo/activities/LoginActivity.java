@@ -13,6 +13,7 @@ import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.LinearLayout;
 
 import com.scv.slackgo.R;
 import com.scv.slackgo.helpers.Constants;
@@ -22,7 +23,7 @@ import java.io.InputStream;
 
 public class LoginActivity extends AppCompatActivity implements View.OnClickListener {
 
-    private ImageView slackButton;
+    private LinearLayout slackButton;
     private LocationsStore locationsStore;
 
     @Override
@@ -34,10 +35,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         String slackCode = getSharedPreferences(Constants.SHARED_PREFERENCES_NAME, MODE_PRIVATE).getString(Constants.SLACK_TOKEN, null);
 
         if (slackCode == null) {
-
-            slackButton = (ImageView) findViewById(R.id.slackButton);
-            String slackLink = getString(R.string.slack_image_link);
-            new DownloadImageTask(slackButton).execute(slackLink);
+            slackButton = (LinearLayout) findViewById(R.id.slackButton);
             slackButton.setOnClickListener(new View.OnClickListener() {
                 public void onClick(View v) {
                     Uri slackUri = Uri.parse(String.format(getString(R.string.slack_link),
@@ -51,7 +49,7 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         } else {
             Intent nextIntent;
             if (locationsStore.isLocationsListEmpty()) {
-                nextIntent = new Intent(this, LocationActivity.class);
+                nextIntent = new Intent(this, LocationMapActivity.class);
             } else {
                 nextIntent = new Intent(this, LocationsListActivity.class);
             }
@@ -64,30 +62,6 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         switch (v.getId()) {
             case R.id.slackButton:
                 slackButton.callOnClick();
-        }
-    }
-
-    private class DownloadImageTask extends AsyncTask<String, Void, Bitmap> {
-        ImageView bmImage;
-
-        public DownloadImageTask(ImageView bmImage) {
-            this.bmImage = bmImage;
-        }
-
-        protected Bitmap doInBackground(String[] urls) {
-            String urldisplay = urls[0];
-            Bitmap mIcon11 = null;
-            try {
-                InputStream in = new java.net.URL(urldisplay).openStream();
-                mIcon11 = BitmapFactory.decodeStream(in);
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return mIcon11;
-        }
-
-        protected void onPostExecute(Bitmap result) {
-            bmImage.setImageBitmap(result);
         }
     }
 }

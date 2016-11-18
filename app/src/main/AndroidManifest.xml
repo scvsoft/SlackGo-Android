@@ -10,7 +10,6 @@
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 
-
     <application
         android:name=".SlackGoApplication"
         android:allowBackup="true"
@@ -21,8 +20,7 @@
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
-            android:value="AIzaSyAEv7OX4I4AfKu_-PFCCltTKVxPFJGGTEQ" />
-
+            android:value="AIzaSyA3SmrqSRgHDRSDj1T2lNf_f0cUIz8sbKo" />
 
         <uses-library android:name="com.google.android.maps" />
 
@@ -31,16 +29,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
                 <action android:name="android.intent.action.MAIN" />
             </intent-filter>
-
         </activity>
 
         <activity
             android:name=".activities.LocationsListActivity"
             android:exported="true"
-            android:launchMode="singleInstance"></activity>
+            android:launchMode="singleInstance"/>
 
         <activity
-            android:name=".activities.LocationActivity"
+            android:name=".activities.LocationMapActivity"
             android:exported="true"
             android:launchMode="singleInstance">
             <intent-filter>
@@ -53,11 +50,13 @@
                 <data android:scheme="scv" />
                 <data android:host="authorize" />
             </intent-filter>
-            <meta-data
-                android:name="com.google.android.gms.version"
-                android:value="@integer/google_play_services_version" />
         </activity>
 
+        <activity
+            android:name=".activities.LocationDetailsActivity"
+            android:exported="true"
+            android:launchMode="singleInstance">
+        </activity>
 
         <service
             android:name=".services.GeofenceTransitionsIntentService"

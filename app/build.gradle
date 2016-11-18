@@ -7,7 +7,7 @@ android {
 
     defaultConfig {
         applicationId "com.scv.slackgo"
-        minSdkVersion 15
+        minSdkVersion 16
         targetSdkVersion 23
         versionCode 1
         versionName "1.0"
@@ -39,6 +39,10 @@ dependencies {
     compile 'org.apache.commons:commons-collections4:4.1'
     compile 'org.apache.commons:commons-lang3:3.4'
 
-    compile group: 'com.google.guava', name: 'guava', version: '19.0'
+    // Dependency HashtagView
+    compile 'com.github.greenfrvr:hashtag-view:1.2.1'
 
+    // Android Swipe Layout
+    compile 'com.baoyz.swipemenulistview:library:1.3.0'
+    compile 'com.android.support:appcompat-v7:23.1.1'
 }

@@ -1,20 +1,17 @@
-package com.scv.slackgo.helpers;
+package com.scv.slackgo.adapters;
 
 import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
-import android.widget.CheckBox;
+import android.widget.ImageView;
 import android.widget.TextView;
 
 import com.scv.slackgo.R;
 import com.scv.slackgo.models.Channel;
 
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
-import org.apache.commons.collections4.comparators.ComparatorChain;
-import org.apache.commons.lang3.ArrayUtils;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -24,15 +21,12 @@ import java.util.List;
  * Created by ayelen on 10/26/16.
  */
 
-class ChannelsListAdapter extends ArrayAdapter<Channel> {
-    // boolean array for storing
-    //the state of each CheckBox
-    boolean[] checkBoxState;
+public class ChannelsListAdapter extends ArrayAdapter<Channel> {
+    public boolean[] checkState;
     Channel[] channels;
     Channel[] selectedChannels;
 
     private Activity context;
-
 
     ViewHolder viewHolder;
 
@@ -44,8 +38,6 @@ class ChannelsListAdapter extends ArrayAdapter<Channel> {
 
         this.context = context;
 
-        unSelectedChannels.addAll(selectedChannels);
-
         Collections.sort(unSelectedChannels, Channel.Comparators.NAME);
 
         this.channels = unSelectedChannels.toArray(new Channel[0]);
@@ -53,10 +45,10 @@ class ChannelsListAdapter extends ArrayAdapter<Channel> {
 
         //create the boolean array with
         //initial state as false
-        checkBoxState = new boolean[unSelectedChannels.size()];
+        checkState = new boolean[unSelectedChannels.size()];
 
         for(int i=0; i < channels.length; i++) {
-            checkBoxState[i] = isIn(selectedChannels, channels[i]);
+            checkState[i] = isIn(selectedChannels, channels[i]);
         }
     }
 
@@ -64,14 +56,14 @@ class ChannelsListAdapter extends ArrayAdapter<Channel> {
     //class for caching the views in a row
     private class ViewHolder {
         TextView channel;
-        CheckBox checkBox;
+        ImageView checkImage;
     }
 
     public Integer[] getItemsChecked() {
         List<Integer> itemsChecked = new ArrayList<Integer>();
 
-        for (int i = 0; i < checkBoxState.length; i++) {
-            if (checkBoxState[i]) {
+        for (int i = 0; i < checkState.length; i++) {
+            if (checkState[i]) {
                 itemsChecked.add(i);
             }
         }
@@ -84,34 +76,29 @@ class ChannelsListAdapter extends ArrayAdapter<Channel> {
     public View getView(final int position, View convertView, ViewGroup parent) {
 
         if (convertView == null) {
-            convertView = context.getLayoutInflater().inflate(R.layout.list_layout, null, true);
+            convertView = context.getLayoutInflater().inflate(R.layout.channels_list_row, null, true);
             viewHolder = new ViewHolder();
 
             viewHolder.channel = (TextView) convertView.findViewById(R.id.channel);
-            viewHolder.checkBox = (CheckBox) convertView.findViewById(R.id.checkBox);
+            viewHolder.checkImage = (ImageView) convertView.findViewById(R.id.check_img);
 
 
             convertView.setTag(viewHolder);
         } else
             viewHolder = (ViewHolder) convertView.getTag();
 
-
-        viewHolder.checkBox.setChecked(checkBoxState[position]);
+        toogleImage(checkState[position]);
         viewHolder.channel.setText(channels[position].getName());
-
-        viewHolder.checkBox.setOnClickListener(new View.OnClickListener() {
-
-            public void onClick(View v) {
-                if (((CheckBox) v).isChecked())
-                    checkBoxState[position] = true;
-                else
-                    checkBoxState[position] = false;
-
-            }
-        });
-
-        //return the view to be displayed
         return convertView;
+    }
+
+
+    private void toogleImage(boolean checkState){
+        if(checkState == true) {
+            viewHolder.checkImage.setImageResource(R.drawable.selected);
+        } else {
+            viewHolder.checkImage.setImageResource(R.drawable.circle);
+        }
     }
 
     private boolean isIn(List<Channel> selectedChannels, final Channel currentChannel) {

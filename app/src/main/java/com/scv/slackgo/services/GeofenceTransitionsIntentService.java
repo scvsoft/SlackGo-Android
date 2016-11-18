@@ -31,7 +31,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.scv.slackgo.R;
-import com.scv.slackgo.activities.LocationActivity;
+import com.scv.slackgo.activities.LocationDetailsActivity;
 import com.scv.slackgo.helpers.GeofenceUtils;
 import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.LocationsStore;
@@ -109,11 +109,11 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
 
     private void sendNotification(String notificationDetails) {
         // Create an explicit content Intent that starts MainActivity.
-        Intent notificationIntent = new Intent(getApplicationContext(), LocationActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
 
         // Get a PendingIntent containing the entire back stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(LocationActivity.class).addNextIntent(notificationIntent);
+        stackBuilder.addParentStack(LocationDetailsActivity.class).addNextIntent(notificationIntent);
         PendingIntent notificationPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 

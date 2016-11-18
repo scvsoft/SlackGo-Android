@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/appBlue"
+    android:orientation="vertical">
+
+    <ImageButton
+        android:layout_width="@dimen/details_icon_side"
+        android:layout_height="@dimen/details_icon_side"
+        android:layout_marginBottom="@dimen/small"
+        android:layout_marginLeft="@dimen/small"
+        android:layout_marginStart="@dimen/small"
+        android:background="@android:color/transparent"
+        android:onClick="saveLocation"
+        android:scaleType="fitCenter"
+        android:src="@drawable/ic_arrow_back" />
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/small"
+        android:layout_marginStart="@dimen/small">
+
+        <ImageView
+            android:id="@+id/location_image"
+            android:layout_width="25dp"
+            android:layout_height="25dp"
+            android:layout_alignParentLeft="true"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_current_location" />
+
+        <ImageButton
+            android:id="@+id/location_name_edit_btn"
+            style="@style/pencil_image"
+            android:onClick="toggleLocationNameEdit" />
+
+        <EditText
+            android:id="@+id/location_name"
+            style="@style/general_details_description"
+            android:layout_marginLeft="@dimen/xxsmall"
+            android:layout_toEndOf="@+id/location_image"
+            android:layout_toRightOf="@+id/location_image"
+            android:ellipsize="end"
+            android:hint="@string/location_hint"
+            android:maxWidth="120dp"
+            android:text="@string/location"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_large" />
+
+        <View
+            android:id="@+id/location_line"
+            style="@style/details_grey_line"
+            android:layout_toEndOf="@+id/location_name"
+            android:layout_toLeftOf="@+id/location_name_edit_btn"
+            android:layout_toRightOf="@+id/location_name"
+            android:layout_toStartOf="@+id/location_name_edit_btn" />
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/details_row_margin"
+        android:layout_marginStart="@dimen/details_row_margin">
+
+        <TextView
+            android:id="@+id/location_address"
+            style="@style/general_details_description"
+            android:fontFamily="sans-serif-thin"
+            android:hint="@string/location_hint"
+            android:maxHeight="@dimen/medium"
+            android:text="@string/location_address"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_medium" />
+
+        <ImageButton
+            android:id="@+id/location_address_edit_btn"
+            style="@style/pencil_image"
+            android:onClick="editMapLocation" />
+
+        <View
+            style="@style/details_grey_line"
+            android:layout_toEndOf="@+id/location_address"
+            android:layout_toLeftOf="@+id/location_address_edit_btn"
+            android:layout_toRightOf="@+id/location_address"
+            android:layout_toStartOf="@+id/location_address_edit_btn" />
+    </RelativeLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="100dp"
+        android:layout_marginEnd="@dimen/details_row_margin"
+        android:layout_marginLeft="@dimen/details_row_margin"
+        android:layout_marginRight="@dimen/details_row_margin"
+        android:layout_marginStart="@dimen/details_row_margin"
+        android:orientation="vertical">
+
+        <com.greenfrvr.hashtagview.HashtagView
+            android:id="@+id/channels_tags"
+            style="@style/HashtagView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:fontFamily="sans-serif-thin" />
+
+    </LinearLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/medium"
+        android:background="@color/channelsListBG">
+
+        <ListView
+            android:id="@+id/channel_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_marginLeft="@dimen/small"
+            android:layout_marginStart="@dimen/small"
+            android:choiceMode="multipleChoice"
+            android:clickable="true"
+            android:divider="@null" />
+    </RelativeLayout>
+
+</LinearLayout>

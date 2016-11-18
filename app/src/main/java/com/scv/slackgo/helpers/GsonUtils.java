@@ -23,13 +23,6 @@ import java.util.Map;
 
 public class GsonUtils {
 
-    public static <C> C getObjectFromJson(String json, Class<C> clazz) {
-        Gson gson = new Gson();
-        C object = gson.fromJson(json, clazz);
-        return object;
-
-    }
-
     public static <C> ArrayList<C> getListFromJson(String json, Class<C[]> clazz) {
         if (json == null) {
             return null;
@@ -44,9 +37,6 @@ public class GsonUtils {
     }
 
     public static <C> C setObject(final C object, JSONObject json) {
-        final String regex = "([A-Z][a-z]+)";
-        final String replacement = "$1_";
-
         try {
             final Map<String, Object> values = toMap(json);
 
@@ -58,7 +48,7 @@ public class GsonUtils {
                     try {
                         input.setAccessible(true);
                         Object value = values.get(CaseFormat.LOWER_CAMEL.to(CaseFormat.LOWER_UNDERSCORE, input.getName()));
-                        if(value != null) {
+                        if (value != null) {
                             input.set(object, value);
                         }
                     } catch (IllegalAccessException e) {
