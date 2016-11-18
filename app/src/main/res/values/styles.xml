@@ -1,11 +1,62 @@
 <resources>
 
     <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.DarkActionBar">
+    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
         <!-- Customize your theme here. -->
         <item name="colorPrimary">@color/colorPrimary</item>
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
+        <item name="android:statusBarColor">@color/mapColor</item>
     </style>
 
+    <style name="row_divider">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_marginTop">@dimen/small</item>
+        <item name="android:layout_marginLeft">@dimen/small</item>
+        <item name="android:layout_marginRight">@dimen/small</item>
+        <item name="android:background">@color/white</item>
+    </style>
+
+    <!--Details styles-->
+    <style name="pencil_image">
+        <item name="android:layout_width">@dimen/details_icon_side</item>
+        <item name="android:layout_height">@dimen/details_icon_side</item>
+        <item name="android:layout_alignParentRight">true</item>
+        <item name="android:layout_alignParentEnd">true</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:scaleType">fitCenter</item>
+        <item name="android:src">@android:drawable/ic_menu_edit</item>
+        <item name="android:layout_marginEnd">@dimen/small</item>
+        <item name="android:layout_marginRight">@dimen/small</item>
+    </style>
+
+    <style name="details_grey_line">
+        <item name="android:layout_width">match_parent</item>
+        <item name="android:layout_height">1dp</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:layout_marginLeft">@dimen/small</item>
+        <item name="android:layout_marginRight">@dimen/small</item>
+        <item name="android:background">@color/detailsSeparator</item>
+    </style>
+
+    <style name="general_details_description">
+        <item name="android:layout_width">wrap_content</item>
+        <item name="android:layout_height">wrap_content</item>
+        <item name="android:layout_centerVertical">true</item>
+        <item name="android:background">@android:color/transparent</item>
+        <item name="android:cursorVisible">false</item>
+    </style>
+
+    <style name="HashtagView">
+        <item name="android:fontFamily">sans-serif-thin</item>
+        <item name="tagTextSize">@dimen/fotn_small</item>
+        <item name="tagBackground">@drawable/channel_button</item>
+        <item name="android:layout_marginEnd">2dp</item>
+        <item name="android:layout_marginRight">2dp</item>
+        <item name="dynamicMode">true</item>
+        <item name="rowGravity">left</item>
+        <item name="tagTextColor">@color/hintWhite</item>
+    </style>
 </resources>

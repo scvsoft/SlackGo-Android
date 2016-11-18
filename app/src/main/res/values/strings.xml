@@ -1,40 +1,19 @@
 <resources>
     <!-- App texts -->
     <string name="app_name">SlackGo</string>
-    <string name="app_welcome">Welcome to SlackGo!</string>
-    <string name="app_welcome_text">This application is used to add (or kick) you to a channel depending on your current location</string>
+    <string name="slack">Slack</string>
 
+    <!-- Error texts -->
     <string name="ok">OK</string>
     <string name="error_title">Ooops!</string>
     <string name="error_msg">An error occurred. Please try again later</string>
     <string name="invalid_location_name">This Location name is already in use.</string>
     <string name="empty_location_name">The Location name can\'t be empty.</string>
     <string name="no_channels_added">You need to add channels to this location.</string>
+    <string name="geocoder_not_working">Right now we can\'t process your addresses</string>
 
-    <!-- activity_layouts text -->
 
-    <string name="add_channel">new channel</string>
-    <string name="add_location">+</string>
-    <string name="location_hint">Location Name</string>
-    <string name="channels_to_join">Channels to join: </string>>
-    <string name="client_id">2946387922.79631581941</string>
-    <string name="redirect_oauth">scv%3A%2F%2Fauthorize</string>
-    <string name="client_secret">4800a7de9816b75e6906ed166ff5662c</string>
-    <string name="back">Back</string>
-
-    <!-- SLACK MESSAGES -->
-
-    <string name="slack_link">https://slack.com/oauth/authorize?scope=%1$s&amp;client_id=%2$s&amp;redirect_uri=%3$s&amp;state=resumeSignIn</string>
-    <string name="slack_image_link">https://platform.slack-edge.com/img/sign_in_with_slack@2x.png</string>
-    <string name="slack_token_url">https://slack.com/api/oauth.access?client_id=%1$s&amp;client_secret=%2$s&amp;code=%3$s&amp;redirect_uri=%4$s</string>
-    <string name="slack_channels_url">https://slack.com/api/channels.list?token=%1$s</string>
-    <string name="slack_channel_join">https://slack.com/api/channels.join?token=%1$s&amp;name=%2$s</string>
-    <string name="slack_channel_leave">https://slack.com/api/channels.leave?token=%1$s&amp;channel=%2$s</string>
-    <string name="slack_team_info">https://slack.com/api/team.info?token=%1$s</string>
-    <string name="slack_scope">channels:write,team:read</string>
-    <string name="slack_token">slackToken</string>
-
-    <!--GEOFENCING ERROR MESSAGES-->
+    <!--GEOFENCING error texts-->
     <string name="geofence_not_available">Geofence service is not available now</string>
     <string name="geofence_too_many_geofences">Your app has registered too many geofences</string>
     <string name="geofence_too_many_pending_intents">
@@ -45,5 +24,37 @@
     </string>
     <string name="entering_geofence">You are entering in a channel geofence</string>
     <string name="going_out_geofence">You are going out of a channel geofence</string>
+
+
+    <!-- Activities (repeated texts)-->
+    <string name="location">Location</string>
+    <string name="location_hint">Location Name</string>
+
+    <!-- login -->
+    <string name="app_welcome">Welcome</string>
+    <string name="sign_in_with">Sign in with</string>
+
+    <!--Location Map Activity-->
+    <string name="save">Save</string>
+    <string name="create_first_location">Create your first location</string>
+
+    <!-- Location Details -->
+    <string name="location_address">Location Address</string>
+
+    <!-- Slack api -->
+    <string name="client_id">2946387922.79631581941</string>
+    <string name="redirect_oauth">scv%3A%2F%2Fauthorize</string>
+    <string name="client_secret">4800a7de9816b75e6906ed166ff5662c</string>
+
+    <!-- SLACK MESSAGES -->
+    <string name="slack_link">https://slack.com/oauth/authorize?scope=%1$s&amp;client_id=%2$s&amp;redirect_uri=%3$s&amp;state=resumeSignIn</string>
+    <string name="slack_image_link">https://platform.slack-edge.com/img/sign_in_with_slack@2x.png</string>
+    <string name="slack_token_url">https://slack.com/api/oauth.access?client_id=%1$s&amp;client_secret=%2$s&amp;code=%3$s&amp;redirect_uri=%4$s</string>
+    <string name="slack_channels_url">https://slack.com/api/channels.list?token=%1$s</string>
+    <string name="slack_channel_join">https://slack.com/api/channels.join?token=%1$s&amp;name=%2$s</string>
+    <string name="slack_channel_leave">https://slack.com/api/channels.leave?token=%1$s&amp;channel=%2$s</string>
+    <string name="slack_team_info">https://slack.com/api/team.info?token=%1$s</string>
+    <string name="slack_scope">channels:write,team:read</string>
+    <string name="slack_token">slackToken</string>
 
 </resources>

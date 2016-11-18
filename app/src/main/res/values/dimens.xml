@@ -4,8 +4,45 @@
     <dimen name="activity_vertical_margin">16dp</dimen>
     <dimen name="button_padding">20dp</dimen>
     <dimen name="text_size">20sp</dimen>
-    <dimen name="title_size">30sp</dimen>
     <dimen name="welcome_margin">40sp</dimen>
     <dimen name="map_height">183dp</dimen>
     <dimen name="plus_size">50dp</dimen>
+
+    <!-- login -->
+    <!-- Logo sizes -->
+    <dimen name="logo_width">130dp</dimen>
+    <dimen name="logo_height">100dp</dimen>
+    <dimen name="login_margin_bottom">13dp</dimen>
+    <dimen name="login_button_height">50dp</dimen>
+
+    <!--Locations List-->
+    <dimen name="gradient_height">200dp</dimen>
+    <dimen name="locations_list_margin_nr">45dp</dimen>
+    <dimen name="navitation_button_height">@dimen/btn_side</dimen>
+    <dimen name="navitation_button_width">28dp</dimen>
+
+    <!--Location Map-->
+    <dimen name="save_button_height">80dp</dimen>
+    <dimen name="address_margin_top">60dp</dimen>
+    <dimen name="searcher_margin_top">40dp</dimen>
+
+    <!--Location Detaisl-->
+    <dimen name="channel_row_height">400dp</dimen>
+    <dimen name="details_icon_side">20dp</dimen>
+    <dimen name="details_row_margin">50dp</dimen>
+
+    <!-- fonts sizes -->
+    <dimen name="font_large">25sp</dimen>
+    <dimen name="font_medium">20sp</dimen>
+    <dimen name="fotn_small">15sp</dimen>
+
+    <!-- margins/paddings/sizes -->
+    <dimen name="xxsmall">5dp</dimen>
+    <dimen name="xsmall">10dp</dimen>
+    <dimen name="small">20dp</dimen>
+    <dimen name="medium">30dp</dimen>
+    <dimen name="large">100dp</dimen>
+    <dimen name="xlarge">120dp</dimen>
+    
+    <dimen name="btn_side">45dp</dimen>
 </resources>

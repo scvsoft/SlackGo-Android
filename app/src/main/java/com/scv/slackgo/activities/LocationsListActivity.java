@@ -1,163 +1,97 @@
 package com.scv.slackgo.activities;
 
-import android.Manifest;
 import android.content.Intent;
-import android.content.pm.PackageManager;
 import android.os.Bundle;
-import android.support.v4.app.ActivityCompat;
+import android.support.v4.app.FragmentActivity;
+import android.support.v4.view.ViewPager;
 import android.view.View;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ListView;
+import android.widget.ImageButton;
 
-import com.google.android.gms.maps.GoogleMap;
 import com.scv.slackgo.R;
-import com.scv.slackgo.helpers.Constants;
-import com.scv.slackgo.helpers.GsonUtils;
+import com.scv.slackgo.adapters.SlackGoPageAdapter;
+import com.scv.slackgo.customs.CustomViewPager;
 import com.scv.slackgo.models.Location;
 import com.scv.slackgo.models.LocationsStore;
 
-import org.apache.commons.collections4.Closure;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.IterableUtils;
-import org.apache.commons.collections4.Transformer;
-
-import java.util.ArrayList;
 import java.util.List;
 
 
 /**
  * Created by ayelen@scvsoft.com.
  */
-public class LocationsListActivity extends MapActivity {
 
-    ListView listView;
+public class LocationsListActivity extends FragmentActivity {
+
+    CustomViewPager pager;
     LocationsStore locationsStore;
-    List<Location> locationsList = new ArrayList<Location>();
-    GoogleMap map;
-
-    @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        initializeVariables();
-        getLoaderManager().destroyLoader(0);
-    }
+    List<Location> locationsList;
+    ImageButton buttonMap;
+    ImageButton buttonList;
 
     @Override
     protected void onResume() {
         super.onResume();
-        //initMap again for load the region added.
-        initMapFragment();
-        loadLocationsList();
-        setListView();
-    }
-
-    @Override
-    public void onSaveInstanceState(Bundle outState) {
-        super.onSaveInstanceState(outState);
-    }
-
-    public void initializeVariables() {
         locationsStore = LocationsStore.getInstance();
-    }
-
-    public void loadLocationsList() {
         locationsList = locationsStore.getList();
     }
 
-    private void setListView() {
-        listView = (ListView) findViewById(R.id.list);
-        if (locationsList.size()>0) {
-            listView.setAdapter(getAdapter());
-            listView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-                @Override
-                public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                    Location locationClicked = locationsList.get(position);
-                    String locationJSON = GsonUtils.getJsonFromObject(locationClicked);
-                    String locationsListJSON = GsonUtils.getJsonFromObject(locationsList);
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_locations_list);
 
-                    Intent locationIntent = new Intent(getApplicationContext(), LocationActivity.class);
-                    locationIntent.putExtra(Constants.INTENT_LOCATION_CLICKED, locationJSON);
-                    locationIntent.putExtra(Constants.INTENT_LOCATION_LIST, locationsListJSON);
-                    startActivity(locationIntent);
+        pager = (CustomViewPager) findViewById(R.id.locations_view_pager);
+        final SlackGoPageAdapter adapter = new SlackGoPageAdapter(getSupportFragmentManager());
+        pager.setAdapter(adapter);
+        pager.setPagingEnabled(true);
+
+        buttonList = (ImageButton) findViewById(R.id.goto_locations_list);
+        buttonMap = (ImageButton) findViewById(R.id.goto_locations_map);
+
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                pager.setCurrentItem(0);
+                buttonMap.setImageResource(R.drawable.ic_map_selected);
+                buttonList.setImageResource(R.drawable.ic_list);
+            }
+        });
+
+        buttonList.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                pager.setCurrentItem(1);
+                adapter.notifyDataSetChanged();
+                buttonMap.setImageResource(R.drawable.ic_map);
+                buttonList.setImageResource(R.drawable.ic_list_selected);
+            }
+        });
+
+        pager.addOnPageChangeListener(new ViewPager.OnPageChangeListener() {
+            @Override
+            public void onPageScrolled(int position, float positionOffset, int positionOffsetPixels) {
+
+            }
+
+            @Override
+            public void onPageSelected(int position) {
+                if ((position==0) && (locationsList.size() != locationsStore.getList().size())){
+                    //TODO check if can use setMapValues
+                    getSupportFragmentManager().getFragments().get(position).onResume();
                 }
-            });
-        } else {
-            listView.setAdapter(null);
+            }
 
-        }
+            @Override
+            public void onPageScrollStateChanged(int state) {
+
+            }
+        });
     }
 
     @Override
-    public void onBackPressed() {
-    }
-
-    private ArrayAdapter<String> getAdapter() {
-        ArrayList<String> locations = setupLocations();
-        return new ArrayAdapter<>(this,
-                android.R.layout.simple_list_item_1, android.R.id.text1, locations);
-    }
-
-    private ArrayList<String> setupLocations() {
-        ArrayList<String> locationListName = null;
-        if (!locationsStore.isLocationsListEmpty()) {
-            locationListName = new ArrayList<>(CollectionUtils.collect(locationsList, new Transformer<Location, String>() {
-                @Override
-                public String transform(Location location) {
-                    return location.getName();
-                }
-            }));
-        }
-        return locationListName;
-    }
+    public void onBackPressed() {}
 
     public void addNewRegion(View view) {
-        Intent locationIntent = new Intent(getApplicationContext(), LocationActivity.class);
-        if (locationsList != null) {
-            String locationsListJSON = GsonUtils.getJsonFromObject(locationsList);
-            locationIntent.putExtra(Constants.INTENT_LOCATION_LIST, locationsListJSON);
-        }
+        Intent locationIntent = new Intent(getApplicationContext(), LocationMapActivity.class);
         startActivity(locationIntent);
+        finish();
     }
-
-    @Override
-    public int getLayoutId() {
-        return R.layout.activity_locations_list;
-    }
-
-    @Override
-    public void onMapReady(GoogleMap googleMap) {
-        map = googleMap;
-        super.onMapReady(googleMap);
-        this.googleMap.getUiSettings().setZoomControlsEnabled(true);
-        this.googleMap.getUiSettings().setCompassEnabled(true);
-        locationsList = locationsStore.getList();
-
-        if ((locationsList == null) || (locationsList.size()==0)) {
-            this.setMarker(new Location(this));
-        } else {
-            IterableUtils.forEach(locationsList, new Closure<Location>() {
-                @Override
-                public void execute(Location loc) {
-                    setMarker(loc);
-                }
-            });
-        }
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-            googleMap.setMyLocationEnabled(true);
-        }
-
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-        for (String permisson : permissions) {
-            if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
-                googleMap.setMyLocationEnabled(true);
-            }
-            break;
-        }
-    }
-
 }

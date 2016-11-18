@@ -29,7 +29,7 @@ public class GeofenceUtils {
     public static Map<String, List<Channel>> getChannelsForGeofences(LocationsStore locationsStore, List<Geofence> geofences) {
         Map<String, List<Channel>> channelsForLocation = new HashedMap<>();
         List<Location> locations = locationsStore.getList();
-        Map<String, List<Channel>> allChannelsForLocationMap = ChannelListHelper.getChannelsListForLocations(locations);
+        Map<String, List<Channel>> allChannelsForLocationMap = getChannelsListForLocations(locations);
 
         for (Location loc : locations) {
             for (Geofence geofence : geofences) {
@@ -58,5 +58,13 @@ public class GeofenceUtils {
                 return geofenceBuilder(loc);
             }
         }));
+    }
+
+    private static Map<String, List<Channel>> getChannelsListForLocations(List<Location> locations) {
+        Map<String, List<Channel>> channelLocationMap = new HashedMap<>();
+        for (Location loc : locations) {
+            channelLocationMap.put(loc.getName(), loc.getChannels());
+        }
+        return channelLocationMap;
     }
 }

@@ -36,7 +36,6 @@ public class SlackApiService implements APIInterface {
 
     protected static final String TAG = "GeofenceTransitionsIS";
 
-
     private RequestQueue queue;
     private Context context;
 

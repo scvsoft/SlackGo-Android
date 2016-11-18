@@ -21,18 +21,12 @@ public class Location {
     private List<Channel> channels;
 
     public Location(Context context) {
-        /* TODO correct permissons to be able to set your location at first.
-        LocationManager lm = (LocationManager)context.getSystemService(Context.LOCATION_SERVICE);
-        android.location.Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-        this.longitude = location.getLongitude();
-        this.latitude = location.getLatitude();
-        */
         this.longitude = Constants.DEFAULT_LONG;
         this.latitude = Constants.DEFAULT_LAT;
         this.name = "";
         this.radius = Constants.DEFAULT_RADIUS_METERS;
         this.cameraZoom = Constants.DEFAULT_CAMERA_ZOOM;
-        this.channels = new ArrayList<Channel>(Arrays.asList(new Channel(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID)));
+        this.channels = new ArrayList<Channel>();
     }
 
     public Location(String name, double latitude, double longitude, float radius, float cameraZoom, List<Channel> channels) {
@@ -42,12 +36,6 @@ public class Location {
         this.radius = radius;
         this.cameraZoom = cameraZoom;
         this.channels = channels;
-    }
-
-    public static Location getSCVLocation() {
-        return new Location(Constants.OFFICE, Constants.SCV_OFFICE_LAT,
-                Constants.SCV_OFFICE_LONG, Constants.DEFAULT_RADIUS_METERS, Constants.DEFAULT_CAMERA_ZOOM,
-                new ArrayList<Channel>(Arrays.asList(new Channel(Constants.OFFICE, false, Constants.OFICINA_CHANNEL_ID))));
     }
 
     public String getName() {

@@ -2,7 +2,9 @@ package com.scv.slackgo.models;
 
 import android.content.Context;
 
+import com.scv.slackgo.R;
 import com.scv.slackgo.SlackGoApplication;
+import com.scv.slackgo.exceptions.InvalidLocationException;
 import com.scv.slackgo.helpers.Constants;
 import com.scv.slackgo.helpers.Preferences;
 
@@ -15,14 +17,12 @@ import java.util.List;
 public class LocationsStore {
     private Context context;
     private Preferences preferences;
-
     private static LocationsStore instance;
 
     public LocationsStore() {
         this.context = SlackGoApplication.get();
         this.preferences = new Preferences(context);
     }
-
 
     public static LocationsStore getInstance() {
         if (instance == null) {
@@ -38,7 +38,6 @@ public class LocationsStore {
         return instance;
     }
 
-
     // Everything related to Locations
     public List<Location> getList() {
         return preferences.getLocationsList();
@@ -51,7 +50,7 @@ public class LocationsStore {
                 return location;
             }
         }
-        return null;
+        return new Location(context);
     }
 
     public void updateLocations(List<Location> locations) {
@@ -59,7 +58,7 @@ public class LocationsStore {
         preferences.addLocationsListToSharedPreferences(locations);
     }
 
-    public void addLocation(Location location) {
+    private void addLocation(Location location) {
         List<Location> locations = getList();
         locations.add(location);
         updateLocations(locations);
@@ -79,9 +78,19 @@ public class LocationsStore {
         return preferences.getChannelsList();
     }
 
-    public void addChannels(List<Channel> channels) {
-        preferences.addChannelsToSharedPreferences(channels);
+    public void saveLocation(Location location, boolean checkChannels) throws InvalidLocationException {
+        if (location.getName().isEmpty()) {
+            throw new InvalidLocationException(context.getString(R.string.empty_location_name));
+        }
+        if (checkChannels) {
+            if (location.getChannels().size() == 0) {
+                throw new InvalidLocationException(context.getString(R.string.no_channels_added));
+            }
+        }
+        if (getList().contains(location)) {
+            throw new InvalidLocationException(context.getString(R.string.invalid_location_name));
+        }
+        addLocation(location);
     }
-
 
 }

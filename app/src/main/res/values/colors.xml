@@ -1,6 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <color name="colorPrimary">#1db08f</color>
+    <color name="colorPrimary">#1DB08f</color>
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
+    <color name="white">#FFFFFF</color>
+    <color name="hintWhite">#50FFFFFF</color>
+    <color name="appBlue">#2C3250</color>
+    <color name="mapColor">@color/appBlue</color>
+    <color name="channelsListBG">#F3F5F6</color>
+    <color name="channelsListSeparartor">#747A98</color>
+    <color name="detailsSeparator">#F3F5F6</color>
 </resources>

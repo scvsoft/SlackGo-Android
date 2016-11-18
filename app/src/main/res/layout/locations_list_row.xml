@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:background="@android:color/transparent"
+    android:orientation="vertical">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginLeft="@dimen/small"
+        android:layout_marginRight="@dimen/small"
+        android:orientation="horizontal">
+
+        <ImageView
+            android:layout_width="@dimen/small"
+            android:layout_height="@dimen/small"
+            android:layout_gravity="center"
+            android:layout_marginEnd="@dimen/xxsmall"
+            android:layout_marginRight="@dimen/xxsmall"
+            android:scaleType="fitCenter"
+            android:src="@android:drawable/checkbox_on_background" />
+
+        <TextView
+            android:id="@+id/location_name"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:fontFamily="sans-serif"
+            android:textColor="@color/white"
+            android:textSize="@dimen/font_large" />
+    </LinearLayout>
+
+    <TextView
+        android:id="@+id/location_address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/locations_list_margin_nr"
+        android:layout_marginStart="@dimen/locations_list_margin_nr"
+        android:textColor="@color/white"
+        android:textSize="@dimen/font_medium" />
+
+    <com.greenfrvr.hashtagview.HashtagView
+        android:id="@+id/channels_tags"
+        style="@style/HashtagView"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="@dimen/locations_list_margin_nr"
+        android:layout_marginStart="@dimen/locations_list_margin_nr"
+        android:fontFamily="sans-serif-thin"
+        app:dynamicMode="false" />
+
+    <View style="@style/row_divider" />
+
+</LinearLayout>
+

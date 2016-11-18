@@ -3,7 +3,6 @@ package com.scv.slackgo.models;
 import com.scv.slackgo.helpers.Constants;
 
 import java.io.Serializable;
-
 import java.util.Comparator;
 
 /**
@@ -11,7 +10,7 @@ import java.util.Comparator;
  */
 
 
-public class Channel implements Comparable<Channel>, Serializable{
+public class Channel implements Comparable<Channel>, Serializable {
 
     String name;
     boolean isArchived;
@@ -47,8 +46,16 @@ public class Channel implements Comparable<Channel>, Serializable{
         return isArchived;
     }
 
-    public void setArchived(boolean archived) {
-        isArchived = archived;
+    @Override
+    public boolean equals(Object o) {
+        if (o == null) {
+            return false;
+        }
+        final Channel otherLocation = (Channel) o;
+        if ((this.id == null) ? (otherLocation.id != null) : !this.id.equals(otherLocation.id)) {
+            return false;
+        }
+        return true;
     }
 
     @Override
