@@ -24,7 +24,7 @@ android {
         applicationId "com.scv.slackgo"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 12
+        versionCode 13
         versionName "1.0"
     }
 
