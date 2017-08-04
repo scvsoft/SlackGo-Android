@@ -47,6 +47,8 @@
             android:hint="@string/location_hint"
             android:maxWidth="120dp"
             android:text="@string/location"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/white"
             android:textSize="@dimen/font_large" />
 
@@ -72,6 +74,8 @@
             android:hint="@string/location_hint"
             android:maxHeight="@dimen/medium"
             android:text="@string/location_address"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/white"
             android:textSize="@dimen/font_medium" />
 
