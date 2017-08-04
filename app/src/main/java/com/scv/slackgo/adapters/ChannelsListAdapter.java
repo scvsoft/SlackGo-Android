@@ -4,6 +4,7 @@ import android.app.Activity;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ArrayAdapter;
+import android.widget.Filter;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -12,9 +13,11 @@ import com.scv.slackgo.models.Channel;
 
 import org.apache.commons.collections4.IterableUtils;
 import org.apache.commons.collections4.Predicate;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 /**
@@ -22,10 +25,9 @@ import java.util.List;
  */
 
 public class ChannelsListAdapter extends ArrayAdapter<Channel> {
-    public boolean[] checkState;
-    Channel[] channels;
-    Channel[] selectedChannels;
-
+    private LinkedHashMap<Channel, Boolean> allChannels;
+    private ArrayList<Channel> listChannels;
+    private Filter filter;
     private Activity context;
 
     ViewHolder viewHolder;
@@ -40,16 +42,11 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
 
         Collections.sort(unSelectedChannels, Channel.Comparators.NAME);
 
-        this.channels = unSelectedChannels.toArray(new Channel[0]);
-        this.selectedChannels = selectedChannels.toArray(new Channel[0]);
-
-        //create the boolean array with
-        //initial state as false
-        checkState = new boolean[unSelectedChannels.size()];
-
-        for(int i=0; i < channels.length; i++) {
-            checkState[i] = isIn(selectedChannels, channels[i]);
+        this.allChannels = new LinkedHashMap<>(unSelectedChannels.size(), unSelectedChannels.size(), false);
+        for (Channel channel: unSelectedChannels) {
+            this.allChannels.put(channel, isIn(selectedChannels, channel));
         }
+        this.listChannels = new ArrayList<>(allChannels.keySet());
     }
 
 
@@ -58,19 +55,6 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
         TextView channel;
         ImageView checkImage;
     }
-
-    public Integer[] getItemsChecked() {
-        List<Integer> itemsChecked = new ArrayList<Integer>();
-
-        for (int i = 0; i < checkState.length; i++) {
-            if (checkState[i]) {
-                itemsChecked.add(i);
-            }
-        }
-
-        return itemsChecked.toArray(new Integer[0]);
-    }
-
 
     @Override
     public View getView(final int position, View convertView, ViewGroup parent) {
@@ -82,13 +66,14 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
             viewHolder.channel = (TextView) convertView.findViewById(R.id.channel);
             viewHolder.checkImage = (ImageView) convertView.findViewById(R.id.check_img);
 
-
             convertView.setTag(viewHolder);
-        } else
+        } else {
             viewHolder = (ViewHolder) convertView.getTag();
+        }
 
-        toogleImage(checkState[position]);
-        viewHolder.channel.setText(channels[position].getName());
+        Channel currentChannel = this.listChannels.get(position);
+        toogleImage(this.allChannels.get(currentChannel));
+        viewHolder.channel.setText(currentChannel.getName());
         return convertView;
     }
 
@@ -111,4 +96,49 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
         return value != null;
     }
 
+    public Channel getChannelFromListPosition(int position) {
+        return this.listChannels.get(position);
+    }
+
+    public void setChannelSelected(Channel channel, Boolean selected) {
+        this.allChannels.put(channel, selected);
+    }
+
+    @Override @NotNull
+    public Filter getFilter() {
+        if(filter == null)
+            filter = new ChannelFilter();
+        return filter;
+    }
+
+    private class ChannelFilter extends Filter {
+        @Override
+        protected FilterResults performFiltering(CharSequence constraint) {
+            constraint = constraint.toString().toLowerCase();
+            FilterResults newFilterResults = new FilterResults();
+            if (constraint != null && constraint.length() > 0) {
+                ArrayList<Channel> filtered = new ArrayList<>();
+                for (LinkedHashMap.Entry<Channel, Boolean> entry : allChannels.entrySet()) {
+                    Channel key = entry.getKey();
+                    Boolean value = entry.getValue();
+                    if (key.getName().toLowerCase().contains(constraint)) {
+                        filtered.add(key);
+                    }
+                }
+                newFilterResults.count = filtered.size();
+                newFilterResults.values = filtered;
+            } else {
+                newFilterResults.count = allChannels.size();
+                newFilterResults.values = new ArrayList<Channel>(allChannels.keySet());
+            }
+            return newFilterResults;
+        }
+
+        @Override
+        protected void publishResults(CharSequence constraint, FilterResults results) {
+            listChannels.clear();
+            listChannels.addAll((ArrayList<Channel>)results.values);
+            notifyDataSetInvalidated();
+        }
+    }
 }

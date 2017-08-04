@@ -8,6 +8,8 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.SpannableString;
+import android.text.Editable;
+import android.text.TextWatcher;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.AdapterView;
@@ -50,6 +52,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     EditText locationName;
     TextView locationAddress;
+    EditText channelsSearch;
     ListView channelsListView;
     HashtagView channelsSelectedTags;
     ChannelsListAdapter channelsListAdapter;
@@ -111,7 +114,19 @@ public class LocationDetailsActivity extends AppCompatActivity {
         locationAddress = (TextView) findViewById(R.id.location_address);
         locationAddress.setFocusable(false);
         channelsListView = (ListView) findViewById(R.id.channel_list);
+        channelsListView.setTextFilterEnabled(true);
         channelsSelectedTags = (HashtagView) findViewById(R.id.channels_tags);
+        channelsSearch = (EditText) findViewById(R.id.channels_search);
+        channelsSearch.addTextChangedListener(new TextWatcher() {
+            @Override
+            public void onTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {
+                channelsListAdapter.getFilter().filter(arg0);
+            }
+            @Override
+            public void beforeTextChanged(CharSequence arg0, int arg1, int arg2, int arg3) {}
+            @Override
+            public void afterTextChanged(Editable arg0) {}
+        });
     }
 
     private void initializeVariables() {
@@ -191,10 +206,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
                         Channel channelClicked = (Channel) item;
                         selectedChannels.remove(channelClicked);
                         channelsSelectedTags.removeItem(item);
-                        //channelGridAdapter.notifyDataSetChanged();
-
-                        int channelsListPosition = channelsList.indexOf(channelClicked);
-                        channelsListAdapter.checkState[channelsListPosition] = false;
+                        channelsListAdapter.setChannelSelected(channelClicked, false);
+                        //channelGridAdapter.notifyDataSetChanged()
                         channelsListAdapter.notifyDataSetChanged();
                         editLocation.setChannels(selectedChannels);
                     }
@@ -203,11 +216,11 @@ public class LocationDetailsActivity extends AppCompatActivity {
                 channelsListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
                     @Override
                     public void onItemClick(AdapterView<?> list, View view, int position, long id) {
-                        Channel channelClicked = channelsList.get(position);
+                        Channel channelClicked = channelsListAdapter.getChannelFromListPosition(position);
                         if (selectedChannels.contains(channelClicked)) {
                             selectedChannels.remove(channelClicked);
                             channelsSelectedTags.removeItem(channelClicked);
-
+                            channelsListAdapter.setChannelSelected(channelClicked, false);
                         } else {
                             selectedChannels.add(channelClicked);
                             if (selectedChannels.size() == 1) {
@@ -215,8 +228,8 @@ public class LocationDetailsActivity extends AppCompatActivity {
                             } else {
                                 channelsSelectedTags.addItem(channelClicked);
                             }
+                            channelsListAdapter.setChannelSelected(channelClicked, true);
                         }
-                        channelsListAdapter.checkState[position] = !channelsListAdapter.checkState[position];
                         channelsListAdapter.notifyDataSetChanged();
                         editLocation.setChannels(selectedChannels);
                     }
