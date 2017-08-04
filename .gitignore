@@ -41,3 +41,4 @@ app/DS_Store
 # Keystore files
 *.jks
 
+fastlane/report.xml
