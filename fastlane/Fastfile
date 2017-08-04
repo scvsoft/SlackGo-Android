@@ -33,8 +33,8 @@ platform :android do
     push_to_git_remote
     gradle(task: "assembleRelease")
     crashlytics(
-      api_token: "f4f89adffefbb3ffe84c5a8a4d7f0e3b253c15aa",
-      build_secret: "b8bba106023790a0baf343749abded19886a9c2fb67fb30ac21077c08dd00c7e"
+      api_token: "45178e641f4bbd9b777cedd7484c5dd9879362ad",
+      build_secret: "abac4e20f08bce38ec99b563cfe3ce39fdbbdb568dae0ee3da0bfd404fface1d"
     )
 
     # sh "your_script.sh"
