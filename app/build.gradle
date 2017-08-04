@@ -9,16 +9,16 @@ android {
         applicationId "com.scv.slackgo"
         minSdkVersion 16
         targetSdkVersion 23
-        versionCode 5
+        versionCode 6
         versionName "1.0"
     }
 
     signingConfigs {
         config {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile file(keystoreProperties['storeFile'])
-            storePassword keystoreProperties['storePassword']
+            keyAlias 'slackgo'
+            keyPassword 'slackgo'
+            storeFile file('./keystores/fastlane.jks')
+            storePassword 'slackgo'
         }
     }
 
