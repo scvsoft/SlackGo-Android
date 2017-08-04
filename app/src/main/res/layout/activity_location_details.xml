@@ -47,6 +47,8 @@
             android:hint="@string/location_hint"
             android:maxWidth="120dp"
             android:text="@string/location"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/white"
             android:textSize="@dimen/font_large" />
 
@@ -72,6 +74,8 @@
             android:hint="@string/location_hint"
             android:maxHeight="@dimen/medium"
             android:text="@string/location_address"
+            android:inputType="text"
+            android:imeOptions="actionDone"
             android:textColor="@color/white"
             android:textSize="@dimen/font_medium" />
 
@@ -103,6 +107,43 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:fontFamily="sans-serif-thin" />
+
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/medium"
+        android:layout_marginEnd="@dimen/small"
+        android:layout_marginLeft="@dimen/small"
+        android:layout_marginRight="@dimen/small"
+        android:layout_marginStart="@dimen/small"
+        android:orientation="horizontal"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true" >
+
+        <ImageView
+            android:id="@+id/search_image"
+            android:layout_width="@dimen/medium"
+            android:layout_height="@dimen/medium"
+            android:layout_centerVertical="true"
+            android:scaleType="fitCenter"
+            android:src="@drawable/ic_search" />
+
+        <EditText
+            android:id="@+id/channels_search"
+            android:layout_width="match_parent"
+            android:layout_height="@dimen/medium"
+            android:layout_centerVertical="true"
+            android:layout_marginLeft="@dimen/xxsmall"
+            android:background="@android:color/transparent"
+            android:hint="@string/channels_search_hint"
+            android:textColor="@color/white"
+            android:textColorHint="@color/hintWhite"
+            android:textCursorDrawable="@drawable/white_cursor"
+            android:textSize="@dimen/font_medium"
+            android:focusableInTouchMode="true"
+            android:focusable="true"
+            android:imeOptions="actionNone" />
 
     </LinearLayout>
 

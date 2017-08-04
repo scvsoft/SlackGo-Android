@@ -40,6 +40,7 @@
 
     <!-- Location Details -->
     <string name="location_address">Location Address</string>
+    <string name="channels_search_hint">Search channels</string>
 
     <!-- Slack api -->
     <string name="client_id">2946387922.79631581941</string>
