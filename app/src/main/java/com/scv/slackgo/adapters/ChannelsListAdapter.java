@@ -28,6 +28,7 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
     private LinkedHashMap<Channel, Boolean> allChannels;
     private ArrayList<Channel> listChannels;
     private Filter filter;
+    private int count;
     private Activity context;
 
     ViewHolder viewHolder;
@@ -47,6 +48,7 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
             this.allChannels.put(channel, isIn(selectedChannels, channel));
         }
         this.listChannels = new ArrayList<>(allChannels.keySet());
+        this.count = unSelectedChannels.size();
     }
 
 
@@ -77,6 +79,10 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
         return convertView;
     }
 
+    @Override
+    public int getCount() {
+        return this.count;
+    }
 
     private void toogleImage(boolean checkState){
         if(checkState == true) {
@@ -138,6 +144,7 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
         protected void publishResults(CharSequence constraint, FilterResults results) {
             listChannels.clear();
             listChannels.addAll((ArrayList<Channel>)results.values);
+            count = results.count;
             notifyDataSetInvalidated();
         }
     }
