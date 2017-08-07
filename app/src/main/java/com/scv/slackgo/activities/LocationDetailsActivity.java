@@ -80,7 +80,7 @@ public class LocationDetailsActivity extends AppCompatActivity {
 
     @Override
     public void onBackPressed() {
-        transitionToLocationsListActivity();
+        this.saveLocation(null);
     }
 
     @Override
