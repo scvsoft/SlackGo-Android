@@ -31,16 +31,18 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 import com.scv.slackgo.R;
-import com.scv.slackgo.activities.LocationDetailsActivity;
+import com.scv.slackgo.activities.LocationsListActivity;
 import com.scv.slackgo.helpers.GeofenceUtils;
 import com.scv.slackgo.models.Channel;
 import com.scv.slackgo.models.LocationsStore;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Observable;
 import java.util.Observer;
+import java.util.Set;
 
 /**
  * Listens for geofence transition changes.
@@ -78,13 +80,22 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
             channelsList = locationsStore.getChannelsList();
         }
 
+        Set<String> channelNames = new HashSet<>();
+        for (List<Channel>channelList : channelsForLocationMap.values()) {
+            for (Channel channel : channelList) {
+                channelNames.add(channel.getName());
+            }
+        }
+        String channels = TextUtils.join(", ", channelNames);
+        String locations = TextUtils.join(", ", channelsForLocationMap.keySet());
+
         String msg = "";
         SlackApiService slackApiService = new SlackApiService(this);
         if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            msg = getString(R.string.entering_geofence);
+            msg = getString(R.string.entering_geofence, locations, channels);
             joinChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
         } else if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            msg = getString(R.string.going_out_geofence);
+            msg = getString(R.string.going_out_geofence, locations, channels);
             leaveChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
         }
         sendNotification(msg);
@@ -109,11 +120,11 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
 
     private void sendNotification(String notificationDetails) {
         // Create an explicit content Intent that starts MainActivity.
-        Intent notificationIntent = new Intent(getApplicationContext(), LocationDetailsActivity.class);
+        Intent notificationIntent = new Intent(getApplicationContext(), LocationsListActivity.class);
 
         // Get a PendingIntent containing the entire back stack.
         TaskStackBuilder stackBuilder = TaskStackBuilder.create(this);
-        stackBuilder.addParentStack(LocationDetailsActivity.class).addNextIntent(notificationIntent);
+        stackBuilder.addParentStack(LocationsListActivity.class).addNextIntent(notificationIntent);
         PendingIntent notificationPendingIntent =
                 stackBuilder.getPendingIntent(0, PendingIntent.FLAG_UPDATE_CURRENT);
 

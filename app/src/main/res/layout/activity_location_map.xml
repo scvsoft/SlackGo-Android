@@ -22,11 +22,11 @@
         android:paddingTop="@dimen/small">
 
         <TextView
-            android:id="@+id/first_location"
+            android:id="@+id/new_location"
             android:layout_width="match_parent"
             android:layout_height="@dimen/medium"
             android:gravity="center|top"
-            android:text="@string/create_first_location"
+            android:text="@string/create_new_location"
             android:textColor="@color/white"
             android:textSize="@dimen/font_large" />
 
