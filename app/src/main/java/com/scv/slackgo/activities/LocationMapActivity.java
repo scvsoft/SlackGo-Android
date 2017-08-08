@@ -54,7 +54,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
 
     protected static final String TAG = "LocationMapActivity";
 
-    TextView firstLocation;
+    TextView newLocation;
     TextView mapLocationAddress;
     EditText locationName;
 
@@ -179,7 +179,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
     }
 
     private void getLayoutResources() {
-        firstLocation = (TextView) findViewById(R.id.first_location);
+        newLocation = (TextView) findViewById(R.id.new_location);
         mapLocationAddress = (TextView) findViewById(R.id.map_location_address);
         locationName = (EditText) findViewById(R.id.location_name);
     }
@@ -215,6 +215,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
     }
 
     private void initializeLayoutValues() {
+        newLocation.setText(locationsList.isEmpty() ? R.string.create_first_location : !isEditing ? R.string.create_new_location : R.string.edit_location);
         String strForLocation = (isEditing) ? editLocation.getName() : "";
         locationName.setText(strForLocation);
     }

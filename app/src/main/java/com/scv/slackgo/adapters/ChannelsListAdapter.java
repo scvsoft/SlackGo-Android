@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by ayelen on 10/26/16.
@@ -124,7 +125,7 @@ public class ChannelsListAdapter extends ArrayAdapter<Channel> {
             FilterResults newFilterResults = new FilterResults();
             if (constraint != null && constraint.length() > 0) {
                 ArrayList<Channel> filtered = new ArrayList<>();
-                for (LinkedHashMap.Entry<Channel, Boolean> entry : allChannels.entrySet()) {
+                for (Map.Entry<Channel, Boolean> entry : allChannels.entrySet()) {
                     Channel key = entry.getKey();
                     Boolean value = entry.getValue();
                     if (key.getName().toLowerCase().contains(constraint)) {
