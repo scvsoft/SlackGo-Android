@@ -71,7 +71,7 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         if (event.hasError()) {
             Log.e(TAG, "GeofencingEvent Error: " + event.getErrorCode());
             String description = getGeofenceTransitionDetails(event);
-            sendNotification(description);
+            sendNotification(getString(R.string.generic_notification_title), description);
             return;
         }
         int transitionType = event.getGeofenceTransition();
@@ -89,16 +89,19 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         String channels = TextUtils.join(", ", channelNames);
         String locations = TextUtils.join(", ", channelsForLocationMap.keySet());
 
-        String msg = "";
+        String title = "";
+        String message = "";
         SlackApiService slackApiService = new SlackApiService(this);
         if (transitionType == Geofence.GEOFENCE_TRANSITION_ENTER) {
-            msg = getString(R.string.entering_geofence, locations, channels);
+            title = getString(R.string.entering_geofence_title, locations);
+            message = getString(R.string.entering_geofence_message, channels);
             joinChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
         } else if (transitionType == Geofence.GEOFENCE_TRANSITION_EXIT) {
-            msg = getString(R.string.going_out_geofence, locations, channels);
+            title = getString(R.string.going_out_geofence_title, locations);
+            message = getString(R.string.going_out_geofence_message, channels);
             leaveChannelsFromGeofences(event.getTriggeringGeofences(), slackApiService);
         }
-        sendNotification(msg);
+        sendNotification(title, message);
     }
 
     @Override
@@ -118,7 +121,7 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         return String.format("%s: %s", transitionString, TextUtils.join(", ", triggeringIDs));
     }
 
-    private void sendNotification(String notificationDetails) {
+    private void sendNotification(String title, String message) {
         // Create an explicit content Intent that starts MainActivity.
         Intent notificationIntent = new Intent(getApplicationContext(), LocationsListActivity.class);
 
@@ -134,8 +137,8 @@ public class GeofenceTransitionsIntentService extends IntentService implements O
         // Define the notification settings.
         builder.setColor(Color.RED)
                 .setSmallIcon(R.drawable.common_ic_googleplayservices)
-                .setContentTitle(notificationDetails)
-                .setContentText("Click notification to return to App")
+                .setContentTitle(title)
+                .setContentText(message)
                 .setContentIntent(notificationPendingIntent)
                 .setAutoCancel(true);
 
