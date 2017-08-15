@@ -14,6 +14,7 @@ import android.view.KeyEvent;
 import android.view.View;
 import android.view.inputmethod.EditorInfo;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -57,6 +58,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
     TextView newLocation;
     TextView mapLocationAddress;
     EditText locationName;
+    LinearLayout saveButton;
 
     GoogleMap googleMap;
     LocationsStore locationsStore;
@@ -114,6 +116,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
                 googleMap.clear();
                 editLocation.setLatitude(latLng.latitude);
                 editLocation.setLongitude(latLng.longitude);
+                saveButton.setVisibility(View.VISIBLE);
                 MapHelper.setMarker(editLocation, googleMap);
                 try {
                     mapLocationAddress.setText(MapHelper.getAddressFromLocation(LocationMapActivity.this, editLocation));
@@ -183,6 +186,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
         newLocation = (TextView) findViewById(R.id.new_location);
         mapLocationAddress = (TextView) findViewById(R.id.map_location_address);
         locationName = (EditText) findViewById(R.id.location_name);
+        saveButton = (LinearLayout) findViewById(R.id.save_button);
     }
 
     private void initializeVariables() {
@@ -205,12 +209,10 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
         locationName.setOnEditorActionListener(new TextView.OnEditorActionListener() {
             @Override
             public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-                boolean handled = false;
                 if (actionId == EditorInfo.IME_ACTION_DONE) {
-                    addLocationDetails(v);
-                    handled = true;
+                    saveButton.setVisibility(View.VISIBLE);
                 }
-                return handled;
+                return false;
             }
         });
     }
@@ -219,6 +221,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
         newLocation.setText(locationsList.isEmpty() ? R.string.create_first_location : !isEditing ? R.string.create_new_location : R.string.edit_location);
         String strForLocation = (isEditing) ? editLocation.getName() : "";
         locationName.setText(strForLocation);
+        saveButton.setVisibility(!isEditing ? View.VISIBLE : View.INVISIBLE);
     }
 
     //TODO repeated method. See if is necessary MapActivity, now can't be re-used because of fragment.

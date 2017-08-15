@@ -35,7 +35,7 @@
         <ImageButton
             android:id="@+id/location_name_edit_btn"
             style="@style/pencil_image"
-            android:onClick="toggleLocationNameEdit" />
+            android:onClick="editMapLocation" />
 
         <EditText
             android:id="@+id/location_name"
@@ -52,13 +52,6 @@
             android:textColor="@color/white"
             android:textSize="@dimen/font_large" />
 
-        <View
-            android:id="@+id/location_line"
-            style="@style/details_grey_line"
-            android:layout_toEndOf="@+id/location_name"
-            android:layout_toLeftOf="@+id/location_name_edit_btn"
-            android:layout_toRightOf="@+id/location_name"
-            android:layout_toStartOf="@+id/location_name_edit_btn" />
     </RelativeLayout>
 
     <RelativeLayout
@@ -79,17 +72,6 @@
             android:textColor="@color/white"
             android:textSize="@dimen/font_medium" />
 
-        <ImageButton
-            android:id="@+id/location_address_edit_btn"
-            style="@style/pencil_image"
-            android:onClick="editMapLocation" />
-
-        <View
-            style="@style/details_grey_line"
-            android:layout_toEndOf="@+id/location_address"
-            android:layout_toLeftOf="@+id/location_address_edit_btn"
-            android:layout_toRightOf="@+id/location_address"
-            android:layout_toStartOf="@+id/location_address_edit_btn" />
     </RelativeLayout>
 
     <LinearLayout

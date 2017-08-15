@@ -275,13 +275,6 @@ public class LocationDetailsActivity extends AppCompatActivity {
         finish();
     }
 
-    public void toggleLocationNameEdit(View view) {
-        locationName.setFocusableInTouchMode(true);
-        locationName.setFocusable(true);
-        locationName.requestFocus();
-        imm.showSoftInput(locationName, InputMethodManager.SHOW_FORCED);
-    }
-
     private void updateEditLocation() {
         editLocation.setName(locationName.getText().toString());
     }
