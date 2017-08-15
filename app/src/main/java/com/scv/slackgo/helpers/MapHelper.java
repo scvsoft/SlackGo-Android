@@ -45,7 +45,7 @@ public class MapHelper {
             Geocoder geocoder = new Geocoder(context, Locale.getDefault());
             List<Address> addresses = geocoder.getFromLocation(location.getLatitude(),
                     location.getLongitude(), 1);
-            return addresses.get(0).getAddressLine(0);
+            return addresses.get(0).getAddressLine(0).split(",")[0];
         } catch (IOException e) {
             Log.e("Geocoder", "Error.", e);
             throw new GeocoderException(context.getString(R.string.geocoder_not_working));

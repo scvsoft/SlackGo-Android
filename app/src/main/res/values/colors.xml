@@ -8,6 +8,6 @@
     <color name="appBlue">#2C3250</color>
     <color name="mapColor">@color/appBlue</color>
     <color name="channelsListBG">#F3F5F6</color>
-    <color name="channelsListSeparartor">#747A98</color>
+    <color name="channelsListSeparartor">#33747A98</color>
     <color name="detailsSeparator">#F3F5F6</color>
 </resources>

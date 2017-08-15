@@ -11,6 +11,7 @@
         android:layout_marginBottom="@dimen/small"
         android:layout_marginLeft="@dimen/small"
         android:layout_marginStart="@dimen/small"
+        android:layout_marginTop="@dimen/small"
         android:background="@android:color/transparent"
         android:onClick="saveLocation"
         android:scaleType="fitCenter"
@@ -24,8 +25,8 @@
 
         <ImageView
             android:id="@+id/location_image"
-            android:layout_width="25dp"
-            android:layout_height="25dp"
+            android:layout_width="@dimen/small"
+            android:layout_height="@dimen/small"
             android:layout_alignParentLeft="true"
             android:layout_alignParentStart="true"
             android:layout_centerVertical="true"
@@ -76,7 +77,7 @@
 
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="100dp"
+        android:layout_height="88dp"
         android:layout_marginEnd="@dimen/details_row_margin"
         android:layout_marginLeft="@dimen/details_row_margin"
         android:layout_marginRight="@dimen/details_row_margin"
@@ -88,25 +89,26 @@
             style="@style/HashtagView"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:fontFamily="sans-serif-thin" />
+            android:fontFamily="sans-serif-thin"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="10dp" />
 
     </LinearLayout>
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="@dimen/medium"
-        android:layout_marginEnd="@dimen/small"
-        android:layout_marginLeft="@dimen/small"
-        android:layout_marginRight="@dimen/small"
-        android:layout_marginStart="@dimen/small"
+        android:paddingRight="@dimen/small"
+        android:paddingLeft="@dimen/small"
         android:orientation="horizontal"
         android:descendantFocusability="beforeDescendants"
-        android:focusableInTouchMode="true" >
+        android:focusableInTouchMode="true"
+        android:background="#888888">
 
         <ImageView
             android:id="@+id/search_image"
-            android:layout_width="@dimen/medium"
-            android:layout_height="@dimen/medium"
+            android:layout_width="@dimen/small"
+            android:layout_height="@dimen/small"
             android:layout_centerVertical="true"
             android:scaleType="fitCenter"
             android:src="@drawable/ic_search" />
@@ -116,7 +118,7 @@
             android:layout_width="match_parent"
             android:layout_height="@dimen/medium"
             android:layout_centerVertical="true"
-            android:layout_marginLeft="@dimen/xxsmall"
+            android:paddingLeft="30dp"
             android:background="@android:color/transparent"
             android:hint="@string/channels_search_hint"
             android:textColor="@color/white"
@@ -128,12 +130,11 @@
             android:imeOptions="actionDone"
             android:inputType="text" />
 
-    </LinearLayout>
+    </RelativeLayout>
 
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/medium"
         android:background="@color/channelsListBG">
 
         <ListView

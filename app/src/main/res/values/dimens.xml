@@ -29,7 +29,7 @@
     <!--Location Detaisl-->
     <dimen name="channel_row_height">400dp</dimen>
     <dimen name="details_icon_side">20dp</dimen>
-    <dimen name="details_row_margin">50dp</dimen>
+    <dimen name="details_row_margin">45dp</dimen>
 
     <!-- fonts sizes -->
     <dimen name="font_large">25sp</dimen>
