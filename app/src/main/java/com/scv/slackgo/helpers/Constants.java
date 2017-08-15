@@ -13,8 +13,8 @@ public final class Constants {
     public static final String SCV_ADDRESS = "Doctor Nicolás Repetto 1841, Ciudad Autonoma Buenos Aires, Argentina";
     public static final float SCV_OFFICE_LAT = -34.6026f;
     public static final float SCV_OFFICE_LONG = -58.4546f;
-    public static final float DEFAULT_LAT = -34.6037f;
-    public static final float DEFAULT_LONG = -58.3819f;
+    public static final float DEFAULT_LAT = SCV_OFFICE_LAT;
+    public static final float DEFAULT_LONG = SCV_OFFICE_LONG;
     public static final String OFFICE = "Office";
     public static final String OFICINA_CHANNEL_ID = "C04C5T185";
     public static final String SLACK_SCV_TEAM = "SCV";

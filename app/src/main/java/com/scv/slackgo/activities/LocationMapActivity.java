@@ -275,45 +275,41 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
 
             slackService.getSlackToken(slackUrl, new SlackTokenListener() {
                 @Override
-                public void onResponse() {
-                    setLocationToTeam();
-                }
+                public void onResponse() {}
 
                 @Override
                 public void onError(Context context) {
                     ErrorUtils.showErrorAlert(context);
                 }
             });
-        } else {
-            setLocationToTeam();
         }
     }
 
-    private void setLocationToTeam() {
-        slackService.getTeam(new TeamNameListener() {
-            @Override
-            public void onResponse(String team) {
-                if (team.equals(Constants.SLACK_SCV_TEAM)) {
-                    try {
-                        LatLng scvLatLng = MapHelper.getLocationFromAddress(LocationMapActivity.this, Constants.SCV_ADDRESS);
-                        editLocation.setLongitude(scvLatLng.longitude);
-                        editLocation.setLatitude(scvLatLng.latitude);
-                        MapHelper.setMarker(editLocation, googleMap);
-                        //mapLocationAddress.setText(MapHelper.getAddressFromLocation(this, editLocation));
-                        mapLocationAddress.setText(Constants.SCV_ADDRESS);
-                    } catch (GeocoderException e) {
-                        ErrorUtils.toastError(LocationMapActivity.this, e.getMessage(), Toast.LENGTH_SHORT);
-                        mapLocationAddress.setText(getString(R.string.location));
-
-                    }
-                }
-            }
-
-            @Override
-            public void onError(Context context) {
-                ErrorUtils.showErrorAlert(context);
-            }
-        });
-    }
+//    private void setLocationToTeam() {
+//        slackService.getTeam(new TeamNameListener() {
+//            @Override
+//            public void onResponse(String team) {
+//                if (team.equals(Constants.SLACK_SCV_TEAM)) {
+//                    try {
+//                        LatLng scvLatLng = MapHelper.getLocationFromAddress(LocationMapActivity.this, Constants.SCV_ADDRESS);
+//                        editLocation.setLongitude(scvLatLng.longitude);
+//                        editLocation.setLatitude(scvLatLng.latitude);
+//                        MapHelper.setMarker(editLocation, googleMap);
+//                        //mapLocationAddress.setText(MapHelper.getAddressFromLocation(this, editLocation));
+//                        mapLocationAddress.setText(Constants.SCV_ADDRESS);
+//                    } catch (GeocoderException e) {
+//                        ErrorUtils.toastError(LocationMapActivity.this, e.getMessage(), Toast.LENGTH_SHORT);
+//                        mapLocationAddress.setText(getString(R.string.location));
+//
+//                    }
+//                }
+//            }
+//
+//            @Override
+//            public void onError(Context context) {
+//                ErrorUtils.showErrorAlert(context);
+//            }
+//        });
+//    }
 
 }

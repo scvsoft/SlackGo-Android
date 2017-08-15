@@ -114,6 +114,7 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
         }
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
+            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
     }
 
