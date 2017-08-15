@@ -84,6 +84,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
+        this.googleMap.setMaxZoomPreference(16);
 
         try {
             // Customise the styling of the base map using a JSON object defined
