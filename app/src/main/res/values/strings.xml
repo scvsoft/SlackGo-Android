@@ -22,9 +22,11 @@
     <string name="unknown_geofence_error">
         Unknown error: the Geofence service is not available now
     </string>
-    <string name="entering_geofence">You are entering %1$s. Joining channels: %2$s</string>
-    <string name="going_out_geofence">You are leaving %1$s. Leaving channels: %2$s</string>
-
+    <string name="entering_geofence_title">You just entered %1$s</string>
+    <string name="entering_geofence_message">Joining %1$s</string>
+    <string name="going_out_geofence_title">You just left %1$s</string>
+    <string name="going_out_geofence_message">Leaving %1$s</string>
+    <string name="generic_notification_title">SlackGo</string>
 
     <!-- Activities (repeated texts)-->
     <string name="location">Location</string>
