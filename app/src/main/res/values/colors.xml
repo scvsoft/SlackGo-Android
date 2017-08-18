@@ -5,6 +5,8 @@
     <color name="colorAccent">#FF4081</color>
     <color name="white">#FFFFFF</color>
     <color name="hintWhite">#50FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="hintBlack">#4D000000</color>
     <color name="appBlue">#2C3250</color>
     <color name="mapColor">@color/appBlue</color>
     <color name="channelsListBG">#F3F5F6</color>

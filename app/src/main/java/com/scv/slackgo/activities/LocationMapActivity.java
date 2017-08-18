@@ -29,6 +29,7 @@ import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.scv.slackgo.R;
 import com.scv.slackgo.exceptions.GeocoderException;
 import com.scv.slackgo.exceptions.InvalidLocationException;
@@ -51,7 +52,7 @@ import static com.scv.slackgo.R.id.channel_map;
  * Created by scvsoft on 11/10/16.
  */
 
-public class LocationMapActivity extends AppCompatActivity implements OnMapReadyCallback {
+public class LocationMapActivity extends AppCompatActivity implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
 
     protected static final String TAG = "LocationMapActivity";
 
@@ -86,6 +87,7 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
     @Override
     public void onMapReady(final GoogleMap googleMap) {
         this.googleMap = googleMap;
+        this.googleMap.setOnMarkerClickListener(this);
         this.googleMap.setMaxZoomPreference(16);
 
         try {
@@ -285,31 +287,9 @@ public class LocationMapActivity extends AppCompatActivity implements OnMapReady
         }
     }
 
-//    private void setLocationToTeam() {
-//        slackService.getTeam(new TeamNameListener() {
-//            @Override
-//            public void onResponse(String team) {
-//                if (team.equals(Constants.SLACK_SCV_TEAM)) {
-//                    try {
-//                        LatLng scvLatLng = MapHelper.getLocationFromAddress(LocationMapActivity.this, Constants.SCV_ADDRESS);
-//                        editLocation.setLongitude(scvLatLng.longitude);
-//                        editLocation.setLatitude(scvLatLng.latitude);
-//                        MapHelper.setMarker(editLocation, googleMap);
-//                        //mapLocationAddress.setText(MapHelper.getAddressFromLocation(this, editLocation));
-//                        mapLocationAddress.setText(Constants.SCV_ADDRESS);
-//                    } catch (GeocoderException e) {
-//                        ErrorUtils.toastError(LocationMapActivity.this, e.getMessage(), Toast.LENGTH_SHORT);
-//                        mapLocationAddress.setText(getString(R.string.location));
-//
-//                    }
-//                }
-//            }
-//
-//            @Override
-//            public void onError(Context context) {
-//                ErrorUtils.showErrorAlert(context);
-//            }
-//        });
-//    }
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        return true;
+    }
 
 }

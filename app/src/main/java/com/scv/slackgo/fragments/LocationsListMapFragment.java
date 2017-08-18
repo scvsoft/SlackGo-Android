@@ -1,6 +1,7 @@
 package com.scv.slackgo.fragments;
 
 import android.Manifest;
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -21,7 +22,11 @@ import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
+import com.google.android.gms.maps.model.Marker;
 import com.scv.slackgo.R;
+import com.scv.slackgo.activities.LocationDetailsActivity;
+import com.scv.slackgo.helpers.Constants;
+import com.scv.slackgo.helpers.GsonUtils;
 import com.scv.slackgo.helpers.MapHelper;
 import com.scv.slackgo.models.Location;
 import com.scv.slackgo.models.LocationsStore;
@@ -38,7 +43,7 @@ import static com.scv.slackgo.R.id.channel_map;
  * Created by scvsoft on 11/9/16.
  */
 
-public class LocationsListMapFragment extends Fragment implements OnMapReadyCallback {
+public class LocationsListMapFragment extends Fragment implements OnMapReadyCallback, GoogleMap.OnMarkerClickListener {
     GoogleMap googleMap;
     LocationsStore locationsStore;
     List<Location> locationsList;
@@ -72,6 +77,7 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
     public void onMapReady(GoogleMap googleMap) {
 
         this.googleMap = googleMap;
+        this.googleMap.setOnMarkerClickListener(this);
         this.googleMap.setMaxZoomPreference(16);
 
         try {
@@ -146,4 +152,20 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
         }
         return builder;
     }
+
+    public void gotoLocation(String location) {
+        String locationsListJSON = GsonUtils.getJsonFromObject(locationsList);
+        Intent locationIntent = new Intent(getActivity(), LocationDetailsActivity.class);
+        locationIntent.putExtra(Constants.INTENT_LOCATION_CLICKED, location);
+        locationIntent.putExtra(Constants.INTENT_LOCATION_LIST, locationsListJSON);
+        startActivity(locationIntent);
+        getActivity().finish();
+    }
+
+    @Override
+    public boolean onMarkerClick(Marker marker) {
+        this.gotoLocation(marker.getTitle());
+        return true;
+    }
+
 }

@@ -97,13 +97,13 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/medium"
+        android:layout_height="80dp"
         android:paddingRight="@dimen/small"
         android:paddingLeft="@dimen/small"
         android:orientation="horizontal"
         android:descendantFocusability="beforeDescendants"
         android:focusableInTouchMode="true"
-        android:background="#888888">
+        android:background="@color/channelsListBG">
 
         <ImageView
             android:id="@+id/search_image"
@@ -111,24 +111,40 @@
             android:layout_height="@dimen/small"
             android:layout_centerVertical="true"
             android:scaleType="fitCenter"
-            android:src="@drawable/ic_search" />
+            android:src="@drawable/ic_search_channel" />
 
         <EditText
             android:id="@+id/channels_search"
             android:layout_width="match_parent"
             android:layout_height="@dimen/medium"
             android:layout_centerVertical="true"
-            android:paddingLeft="30dp"
+            android:paddingLeft="40dp"
             android:background="@android:color/transparent"
             android:hint="@string/channels_search_hint"
-            android:textColor="@color/white"
-            android:textColorHint="@color/hintWhite"
-            android:textCursorDrawable="@drawable/white_cursor"
+            android:textColor="@color/black"
+            android:textColorHint="@color/hintBlack"
+            android:textCursorDrawable="@drawable/black_cursor"
             android:textSize="@dimen/font_medium"
             android:focusableInTouchMode="true"
             android:focusable="true"
             android:imeOptions="actionDone"
             android:inputType="text" />
+
+    </RelativeLayout>
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:descendantFocusability="beforeDescendants"
+        android:focusableInTouchMode="true"
+        android:background="@color/channelsListBG">
+
+        <View
+            android:layout_width="match_parent"
+            android:layout_height="1dp"
+            android:layout_gravity="center"
+            android:background="@color/channelsListSeparartor"
+            android:gravity="bottom" />
 
     </RelativeLayout>
 

@@ -33,10 +33,10 @@ public class MapHelper {
 
         googleMap.addCircle(new CircleOptions().center(officePosition)
                 .radius(location.getRadius())
-                .strokeColor(Color.argb(200, 255, 0, 255))
-                .fillColor(Color.argb(25, 255, 0, 255)));
+                .strokeColor(Color.argb(255, 239, 83, 80))
+                .fillColor(Color.argb(25, 239, 83, 80)));
 
-        googleMap.addMarker(markerOptions);
+        googleMap.addMarker(markerOptions).showInfoWindow();
         googleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(officePosition, location.getCameraZoom()));
     }
 
