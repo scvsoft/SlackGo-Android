@@ -42,10 +42,24 @@
 
     <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="@dimen/gradient_height"
+        android:layout_height="140dp"
         android:layout_gravity="bottom|right"
         android:background="@drawable/up_gradient"
         android:clickable="false">
+
+        <ImageButton
+            android:id="@+id/center_position"
+            android:layout_width="@dimen/btn_side"
+            android:layout_height="@dimen/btn_side"
+            android:layout_alignParentEnd="true"
+            android:layout_alignParentRight="true"
+            android:layout_marginBottom="@dimen/small"
+            android:layout_marginEnd="@dimen/small"
+            android:layout_marginRight="@dimen/small"
+            android:background="@android:color/transparent"
+            android:onClick="centerLocation"
+            android:scaleType="fitCenter"
+            android:src="@drawable/btn_location" />
 
         <ImageButton
             android:id="@+id/add_region_button"
@@ -54,7 +68,7 @@
             android:layout_alignParentBottom="true"
             android:layout_alignParentEnd="true"
             android:layout_alignParentRight="true"
-            android:layout_marginBottom="@dimen/small"
+            android:layout_marginBottom="@dimen/medium"
             android:layout_marginEnd="@dimen/small"
             android:layout_marginRight="@dimen/small"
             android:background="@android:color/transparent"

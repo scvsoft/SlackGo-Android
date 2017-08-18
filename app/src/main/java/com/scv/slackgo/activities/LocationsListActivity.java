@@ -3,13 +3,16 @@ package com.scv.slackgo.activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.view.View;
 import android.widget.ImageButton;
 
+import com.google.android.gms.maps.GoogleMap;
 import com.scv.slackgo.R;
 import com.scv.slackgo.adapters.SlackGoPageAdapter;
 import com.scv.slackgo.customs.CustomViewPager;
+import com.scv.slackgo.helpers.MapHelper;
 import com.scv.slackgo.models.Location;
 import com.scv.slackgo.models.LocationsStore;
 
@@ -94,4 +97,10 @@ public class LocationsListActivity extends FragmentActivity {
         startActivity(locationIntent);
         finish();
     }
+
+    public void centerLocation(View view) {
+        Intent intent = new Intent("centerMap");
+        LocalBroadcastManager.getInstance(this).sendBroadcast(intent);
+    }
+
 }

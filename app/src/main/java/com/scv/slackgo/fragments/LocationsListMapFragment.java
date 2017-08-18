@@ -1,7 +1,10 @@
 package com.scv.slackgo.fragments;
 
 import android.Manifest;
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.content.res.Resources;
 import android.os.Bundle;
@@ -9,18 +12,16 @@ import android.support.annotation.Nullable;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.model.LatLng;
-import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.android.gms.maps.model.MapStyleOptions;
 import com.google.android.gms.maps.model.Marker;
 import com.scv.slackgo.R;
@@ -54,6 +55,13 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
         locationsStore = LocationsStore.getInstance();
         locationsList = locationsStore.getList();
         initMapFragment();
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mMessageReceiver, new IntentFilter("centerMap"));
+    }
+
+    @Override
+    public void onPause() {
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mMessageReceiver);
+        super.onPause();
     }
 
     @Override
@@ -113,14 +121,10 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
                     locationsLatLngList.add(locLatLng);
                 }
             });
-
-            if (locationsLatLngList.size() > 1) {
-                centerAndUpdateZoomLevel(locationsLatLngList);
-            }
+            MapHelper.centerLocation(getContext(), googleMap);
         }
         if (ActivityCompat.checkSelfPermission(getContext(), Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             googleMap.setMyLocationEnabled(true);
-            googleMap.getUiSettings().setMyLocationButtonEnabled(true);
         }
     }
 
@@ -131,26 +135,6 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
         fragmentTransaction.replace(channel_map, mapFragment);
         fragmentTransaction.commit();
         mapFragment.getMapAsync(this);
-    }
-
-    private void centerAndUpdateZoomLevel(List<LatLng> latLngList) {
-        CameraUpdate cameraUpdate = null;
-        LatLngBounds.Builder builder = buildLatLnagBounds(latLngList);
-        if (!latLngList.isEmpty()) {
-            LatLngBounds bounds = builder.build();
-            cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 500);
-        }
-        if (cameraUpdate != null && googleMap != null) {
-            googleMap.moveCamera(cameraUpdate);
-        }
-    }
-
-    private LatLngBounds.Builder buildLatLnagBounds(List<LatLng> latLngList) {
-        LatLngBounds.Builder builder = new LatLngBounds.Builder();
-        for (LatLng latLang : latLngList) {
-            builder.include(latLang);
-        }
-        return builder;
     }
 
     public void gotoLocation(String location) {
@@ -167,5 +151,12 @@ public class LocationsListMapFragment extends Fragment implements OnMapReadyCall
         this.gotoLocation(marker.getTitle());
         return true;
     }
+
+    private BroadcastReceiver mMessageReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            MapHelper.centerLocation(context, googleMap);
+        }
+    };
 
 }
