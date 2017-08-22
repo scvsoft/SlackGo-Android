@@ -34,7 +34,8 @@ platform :android do
     gradle(task: "assembleRelease")
     crashlytics(
       api_token: "45178e641f4bbd9b777cedd7484c5dd9879362ad",
-      build_secret: "abac4e20f08bce38ec99b563cfe3ce39fdbbdb568dae0ee3da0bfd404fface1d"
+      build_secret: "abac4e20f08bce38ec99b563cfe3ce39fdbbdb568dae0ee3da0bfd404fface1d",
+      groups: "scvbetatesta"
     )
 
     # sh "your_script.sh"
