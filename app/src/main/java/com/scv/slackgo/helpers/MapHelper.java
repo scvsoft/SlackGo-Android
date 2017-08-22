@@ -101,7 +101,7 @@ public class MapHelper {
             cameraUpdate = CameraUpdateFactory.newLatLngBounds(bounds, 500);
         }
         if (cameraUpdate != null && googleMap != null) {
-            googleMap.moveCamera(cameraUpdate);
+            googleMap.animateCamera(cameraUpdate);
         }
     }
 
